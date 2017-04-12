@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="btbox_sample_rates">
+        <item>100Hz</item>
+        <item>250Hz</item>
+        <item>500Hz</item>
+    </string-array>
+</resources>

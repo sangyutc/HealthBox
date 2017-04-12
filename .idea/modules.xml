@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/HealthBox.iml" filepath="$PROJECT_DIR$/HealthBox.iml" />
+      <module fileurl="file://$PROJECT_DIR$/boxmeter/boxmeter.iml" filepath="$PROJECT_DIR$/boxmeter/boxmeter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/heartmeter/heartmeter.iml" filepath="$PROJECT_DIR$/heartmeter/heartmeter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/shared/shared.iml" filepath="$PROJECT_DIR$/shared/shared.iml" />
+    </modules>
+  </component>
+</project>
