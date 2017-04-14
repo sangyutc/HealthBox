@@ -1,10 +1,36 @@
 package com.presisco.shared.utils;
 
+import java.util.List;
+
 /**
  * Created by presisco on 2017/4/8.
  */
 
 public class ByteUtils {
+    public static int[] IntegerList2intArray(List<Integer> src) {
+        int[] converted = new int[src.size()];
+        for (int i = 0; i < src.size(); ++i) {
+            converted[i] = src.get(i);
+        }
+        return converted;
+    }
+
+    public static float[] IntegerList2floatArray(List<Integer> src) {
+        float[] converted = new float[src.size()];
+        for (int i = 0; i < src.size(); ++i) {
+            converted[i] = src.get(i);
+        }
+        return converted;
+    }
+
+    public static float[] intArray2floatArray(int[] src) {
+        float[] converted = new float[src.length];
+        for (int i = 0; i < src.length; ++i) {
+            converted[i] = src[i];
+        }
+        return converted;
+    }
+
     public static int byte2int_unsigned(final byte src) {
         int result = src & 0x000000FF;
         return result;

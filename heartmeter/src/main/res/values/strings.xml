@@ -7,27 +7,35 @@
     <string name="title_history">历史记录</string>
     <string name="label_monitor_mode">监控模式</string>
     <string name="label_history_mode">历史模式</string>
+    <string name="label_start">开始</string>
+    <string name="label_stop">停止</string>
 
     <string-array name="title_warning_bt">
         <item>警告：</item>
         <item>蓝牙未启用</item>
         <item>设备未配对</item>
-        <item>设备未连接</item>
+        <item>设备无法连接</item>
+        <item>设备连接失败</item>
     </string-array>
     <string-array name="text_warning_bt">
         <item> </item>
         <item>请开启蓝牙功能</item>
         <item>请与蓝牙设备进行配对</item>
         <item>请确认设备已配对并连接</item>
+        <item>请重启设备</item>
     </string-array>
 
     <string-array name="realtime_modes">
-        <item>通用</item>
+        <item>心率显示</item>
+        <item>心率曲线 2秒</item>
+        <item>心电曲线 2秒</item>
         <item>有氧运动</item>
     </string-array>
 
     <string-array name="realtime_mode_hints">
-        <item>默认模式</item>
+        <item>默认，显示心率数据</item>
+        <item>默认，显示2秒内心率曲线</item>
+        <item>默认，显示2秒内心电曲线</item>
         <item>慢跑，游泳等</item>
     </string-array>
 

@@ -1,5 +1,9 @@
 package com.example.heartmeter.UI.Fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -13,8 +17,14 @@ import android.widget.Spinner;
 
 import com.example.heartmeter.R;
 import com.example.heartmeter.Service.BTService;
+import com.example.heartmeter.Service.HubService;
+import com.presisco.shared.ui.framework.monitor.LinePanelFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
+import com.presisco.shared.ui.framework.monitor.ValuePanelFragment;
+import com.presisco.shared.utils.ByteUtils;
+
+import lecho.lib.hellocharts.util.ChartUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,6 +42,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     private int currrent_mode_id = 0;
     private MonitorPanelFragment mCurrentPanel;
 
+    private HubReceiver mHubReceiver = new HubReceiver();
 
     public RealtimeFragment() {
     }
@@ -52,6 +63,8 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getContext());
+        mLocalBroadcastManager.registerReceiver(mHubReceiver, new IntentFilter(HubService.ACTION_DATA_REDUCED));
+        mLocalBroadcastManager.registerReceiver(mHubReceiver, new IntentFilter(HubService.ACTION_DATA_RAW));
         //mLocalBroadcastManager.registerReceiver();
         modes = getResources().getStringArray(R.array.realtime_modes);
         hints = getResources().getStringArray(R.array.realtime_mode_hints);
@@ -76,10 +89,12 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
                 currrent_mode_id = pos;
                 switch (pos) {
                     case 0:
+                    case 3:
                         mMonitorHost.displayPanel(MonitorHostFragment.PANEL_VALUE);
                         break;
                     case 1:
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_VALUE);
+                    case 2:
+                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
                         break;
                 }
             }
@@ -90,6 +105,25 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             }
         });
         mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, modes));
+
+        rootView.findViewById(R.id.buttonStart).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLocalBroadcastManager.sendBroadcast(
+                        new Intent(HubService.ACTION_SEND_INSTRUCTION)
+                                .putExtra(HubService.KEY_INSTRUCTION, HubService.SEND_START));
+                mCurrentPanel.clear();
+            }
+        });
+        rootView.findViewById(R.id.buttonStop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLocalBroadcastManager.sendBroadcast(
+                        new Intent(HubService.ACTION_SEND_INSTRUCTION)
+                                .putExtra(HubService.KEY_INSTRUCTION, HubService.SEND_STOP));
+            }
+        });
+
         return rootView;
     }
 
@@ -104,10 +138,67 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
         mCurrentPanel.setTitle(modes[currrent_mode_id]);
         mCurrentPanel.setHint(hints[currrent_mode_id]);
         switch (currrent_mode_id) {
-            case 0:
-                break;
             case 1:
+                LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
+                linePanel.setAxisYScale(-10, 260);
+                linePanel.setMaxPoints(200);
+                linePanel.setAxisXText("Time");
+                linePanel.setAxisYText("Rate");
+                LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
+                style.line_color = ChartUtils.COLOR_BLUE;
+                style.has_points = false;
+                linePanel.setLineStyle(style);
                 break;
+            case 2:
+                linePanel = (LinePanelFragment) mCurrentPanel;
+                linePanel.setAxisYScale(0, 1500);
+                linePanel.setMaxPoints(200);
+                linePanel.setAxisXText("Time");
+                linePanel.setAxisYText("Voltage");
+                style = new LinePanelFragment.LineStyle();
+                style.line_color = ChartUtils.COLOR_BLUE;
+                style.has_points = false;
+                linePanel.setLineStyle(style);
+                break;
+        }
+    }
+
+    private class HubReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (currrent_mode_id) {
+                case 3:
+                case 0:
+                    if (!(intent.getAction() == HubService.ACTION_DATA_REDUCED)) {
+                        return;
+                    }
+                    ((ValuePanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    break;
+                case 1:
+                    if (!(intent.getAction() == HubService.ACTION_DATA_RAW)) {
+                        return;
+                    }
+                    if (!(intent.getIntExtra(HubService.KEY_TYPE, 0) == HubService.TYPE_HEARTRATE)) {
+                        return;
+                    }
+                    LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
+                    int[] heart_rate_data = intent.getIntArrayExtra(HubService.KEY_DATA);
+                    float[] converted = ByteUtils.intArray2floatArray(heart_rate_data);
+                    linePanel.appendValue(converted);
+                    break;
+                case 2:
+                    if (!(intent.getAction() == HubService.ACTION_DATA_RAW)) {
+                        return;
+                    }
+                    if (!(intent.getIntExtra(HubService.KEY_TYPE, 0) == HubService.TYPE_ECG)) {
+                        return;
+                    }
+                    linePanel = (LinePanelFragment) mCurrentPanel;
+                    int[] ecg_data = intent.getIntArrayExtra(HubService.KEY_DATA);
+                    converted = ByteUtils.intArray2floatArray(ecg_data);
+                    linePanel.appendValue(converted);
+                    break;
+            }
         }
     }
 }

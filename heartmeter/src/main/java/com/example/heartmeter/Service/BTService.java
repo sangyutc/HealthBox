@@ -6,13 +6,14 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.Binder;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 
 import com.example.heartmeter.R;
 import com.presisco.shared.bluetooth.BluetoothSerialPortManager;
 import com.presisco.shared.service.BaseBluetoothService;
 import com.presisco.shared.utils.ByteUtils;
+import com.presisco.shared.utils.LCAT;
 
 public class BTService extends BaseBluetoothService
         implements
@@ -37,7 +38,6 @@ public class BTService extends BaseBluetoothService
     private static String[] TEXT_WARNING_TITLE;
     private static String[] TEXT_WARNING_CONTENT;
     //private String mTargetAdress="98:D3:31:00:02:25";
-    private final IBinder mBinder = new BTServiceBinder();
     private int mBTByteCursor = 0;
     private int mBTPacketSize = MIN_PACKET_SIZE;
     private int mPacketType = HEAD_RESPONSE;
@@ -50,11 +50,6 @@ public class BTService extends BaseBluetoothService
         Resources res = getResources();
         TEXT_WARNING_TITLE = res.getStringArray(R.array.title_warning_bt);
         TEXT_WARNING_CONTENT = res.getStringArray(R.array.text_warning_bt);
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
     }
 
     public void sendWarnNotification(int code) {
@@ -81,18 +76,31 @@ public class BTService extends BaseBluetoothService
         if (!mBTManager.devicePaired(TARGET_DEVICE_NAME)) {
             sendWarnNotification(WARN_CODE_NOT_PAIRED);
         }
-        mBTManager.setTargetDeviceType(BluetoothSerialPortManager.DEV_TYPE_BLOCK);
-        mBTManager.setListeners(this);
-        mBTManager.setReceiveBufferSize(5);
+        mBTManager.setTargetDeviceType(BluetoothSerialPortManager.DEV_TYPE_BYTE);
+        mBTManager.setByteListener(this);
+        mBTManager.setBluetoothStateListener(this);
         setTargetName(TARGET_DEVICE_NAME);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        LCAT.d(this, "created");
         loadStringRes();
         setup();
-        connected();
+        startConnection();
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        IBinder binder = super.onBind(intent);
+        return binder;
     }
 
     @Override
@@ -100,20 +108,15 @@ public class BTService extends BaseBluetoothService
         super.onDestroy();
     }
 
-    /*
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
-    }
-    */
     @Override
     public void connectFailed() {
-
+        sendWarnNotification(WARN_CODE_CONNECT_FAILED);
     }
 
     @Override
     public void connected() {
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(WARN_CODE_DISCONNECTED);
+        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(WARN_CODE_CONNECT_FAILED);
     }
 
     @Override
@@ -158,7 +161,9 @@ public class BTService extends BaseBluetoothService
                     for (int i = 0; i < mBTPacketSize - 1; ++i) {
                         packet[i] = mBTBuffer[i];
                     }
-                    broadcastData(packet);
+                    //LCAT.d(this,"receiverd packet: "+ByteUtils.bytes2hex(packet));
+                    //broadcastData(packet);
+                    getPacketReceivedListener().onReceived(packet);
                 }
                 mBTByteCursor = INDEX_PACKET_HEAD - 1;
                 mBTPacketSize = MIN_PACKET_SIZE;
@@ -167,11 +172,5 @@ public class BTService extends BaseBluetoothService
             }
         }
         mBTByteCursor++;
-    }
-
-    public class BTServiceBinder extends Binder {
-        public BTService getService() {
-            return BTService.this;
-        }
     }
 }

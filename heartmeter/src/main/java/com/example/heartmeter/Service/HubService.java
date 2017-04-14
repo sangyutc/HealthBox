@@ -1,23 +1,31 @@
 package com.example.heartmeter.Service;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.IBinder;
 
 import com.example.heartmeter.Data.SensorData;
 import com.presisco.shared.service.BaseBluetoothService;
 import com.presisco.shared.service.BaseHubService;
 import com.presisco.shared.utils.ByteUtils;
+import com.presisco.shared.utils.LCAT;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
 
-public class HubService extends BaseHubService {
+public class HubService extends BaseHubService implements BaseBluetoothService.PacketReceivedListener {
 
     public static final String KEY_INSTRUCTION = "INSTRUCTION";
     public static final String KEY_SAMPLE_RATE = "SAMPLE_RATE";
     public static final String KEY_FILTER = "FILTER";
+
+    public static final int TYPE_HEARTRATE = 0;
+    public static final int TYPE_ECG = 1;
 
     public static final byte SAMPLERATE_100HZ = 0x01;
     public static final byte SAMPLERATE_250HZ = 0x02;
@@ -36,6 +44,13 @@ public class HubService extends BaseHubService {
     private static final int HEAD_RESPONSE = 0xC0;
 
     int mInstructionIdCounter = 1;
+    int mSampleRate = 100;
+    BTServiceConnection mConnection = new BTServiceConnection();
+    BaseBluetoothService mBTService;
+    private ArrayList<Integer> raw_heartrate = new ArrayList<>();
+    private ArrayList<Integer> filtered_heartrate = new ArrayList<>();
+    private ArrayList<Integer> raw_ecg = new ArrayList<>();
+    private int data_packet_counter = 1;
 
     public HubService() {
 
@@ -52,8 +67,9 @@ public class HubService extends BaseHubService {
     @Override
     public void onCreate() {
         super.onCreate();
-        registerReceiver(new BTServiceReceiver(), new IntentFilter(BaseBluetoothService.ACTION_TARGET_DATA_RECEIVED));
-        registerReceiver(new HubReceiver(), new IntentFilter(ACTION_SEND_INSTRUCTION));
+        //registerLocalReceiver(new BTServiceReceiver(), new IntentFilter(BaseBluetoothService.ACTION_TARGET_DATA_RECEIVED));
+        registerLocalReceiver(new HubHostReceiver(), new IntentFilter(ACTION_SEND_INSTRUCTION));
+        bindService(new Intent(this, BTService.class), mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -125,6 +141,17 @@ public class HubService extends BaseHubService {
                 break;
             case CHANGE_SAMPLE_RATE:
                 instruction[5] = intent.getByteExtra(KEY_SAMPLE_RATE, SAMPLERATE_100HZ);
+                switch (intent.getByteExtra(KEY_SAMPLE_RATE, SAMPLERATE_100HZ)) {
+                    case SAMPLERATE_100HZ:
+                        mSampleRate = 100;
+                        break;
+                    case SAMPLERATE_250HZ:
+                        mSampleRate = 250;
+                        break;
+                    case SAMPLERATE_500HZ:
+                        mSampleRate = 500;
+                        break;
+                }
                 break;
             case CHANGE_FILTER:
                 instruction[5] = intent.getByteExtra(KEY_FILTER, FILTER_ON);
@@ -147,56 +174,105 @@ public class HubService extends BaseHubService {
         return data.status == SensorData.STATUS_NORMAL;
     }
 
-    private boolean need2Dump(SensorData data) {
-        return !(data.heart_rate > 20 && data.heart_rate < 180);
-    }
-
-    private int reduce(ArrayList<Integer> data) {
-
-        return 0;
-    }
-
-    private class BTServiceReceiver extends BroadcastReceiver {
-        private ArrayList<Integer> raw_data;
-        private ArrayList<Integer> filtered_data;
-        private boolean receiving_data = false;
-        private int data_packet_counter = 1;
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            byte[] packet = intent.getByteArrayExtra(BaseBluetoothService.KEY_DATA);
-            if (ByteUtils.byteHighMatch(packet[0], HEAD_RESPONSE)) {
-
-            } else {
-                data_packet_counter++;
-                SensorData data = SensorData.parseDataPacket(packet);
-                receiving_data = true;
-                if (!isValidData(data)) {
-                    return;
-                }
-                raw_data.add(data.heart_rate);
-                if (need2Dump(data)) {
-                    return;
-                }
-                filtered_data.add(data.heart_rate);
-                if (data_packet_counter == 100) {
-                    broadcastReduced(reduce(filtered_data));
-                    broadcastFiltered((Integer[]) filtered_data.toArray());
-                    broadcastRaw((Integer[]) raw_data.toArray());
-                }
-            }
+    private boolean isValidHeartrate(SensorData data) {
+        if (data.heart_rate < 20) {
+            return false;
         }
-
+        return data.heart_rate <= 180;
     }
 
-    private class HubReceiver extends BroadcastReceiver {
+    private int reduceHeartrate(ArrayList<Integer> data) {
+        int sum = 0;
+        for (Integer point : data) {
+            sum += point;
+        }
+        if (data.size() == 0) {
+            return -1;
+        } else {
+            return sum / data.size();
+        }
+    }
+
+    @Override
+    public void onReceived(byte[] packet) {
+        if (ByteUtils.byteHighMatch(packet[0], HEAD_RESPONSE)) {
+            LCAT.d(this, "received packet: " + ByteUtils.bytes2hex(packet));
+        } else {
+            data_packet_counter++;
+            if (data_packet_counter > mSampleRate) {
+                LCAT.d(this, "finished one batch -- raw amount: " + raw_heartrate.size() + ", filtered amount: " + filtered_heartrate.size());
+
+                broadcastReduced(TYPE_HEARTRATE, reduceHeartrate(filtered_heartrate));
+                //broadcastFiltered(TYPE_HEARTRATE,ByteUtils.IntegerList2intArray(filtered_heartrate));
+                broadcastRaw(TYPE_HEARTRATE, ByteUtils.IntegerList2intArray(raw_heartrate));
+
+                broadcastRaw(TYPE_ECG, ByteUtils.IntegerList2intArray(raw_ecg));
+
+                raw_heartrate.clear();
+                filtered_heartrate.clear();
+                raw_ecg.clear();
+                data_packet_counter = 0;
+            }
+            SensorData data = SensorData.parseDataPacket(packet);
+            if (!isValidData(data)) {
+                return;
+            }
+            raw_heartrate.add(data.heart_rate);
+            raw_ecg.add(data.ecg);
+            if (!isValidHeartrate(data)) {
+                return;
+            }
+            filtered_heartrate.add(data.heart_rate);
+        }
+    }
+
+    private class HubHostReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            LCAT.d(this, "broadcast received: " + intent.getAction());
             switch (intent.getAction()) {
                 case ACTION_SEND_INSTRUCTION:
-                    sendInstruction(intent);
+                    if (intent.getByteExtra(KEY_INSTRUCTION, UNKNOWN) == SEND_START) {
+                        new StartMeasureTask().executeOnExecutor(Executors.newSingleThreadExecutor());
+                    } else {
+                        sendInstruction(intent);
+                    }
                     break;
             }
+        }
+    }
+
+    private class StartMeasureTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                sendInstruction(new Intent()
+                        .putExtra(KEY_INSTRUCTION, CHANGE_SAMPLE_RATE)
+                        .putExtra(KEY_SAMPLE_RATE, SAMPLERATE_100HZ));
+                Thread.sleep(500);
+                sendInstruction(new Intent()
+                        .putExtra(KEY_INSTRUCTION, CHANGE_FILTER)
+                        .putExtra(KEY_FILTER, FILTER_ON));
+                Thread.sleep(500);
+                sendInstruction(new Intent()
+                        .putExtra(KEY_INSTRUCTION, SEND_START));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    private class BTServiceConnection implements ServiceConnection {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBTService = ((BaseBluetoothService.BaseBTServiceBinder) service).getService();
+            mBTService.setPacketReceivedListener(HubService.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBTService = null;
         }
     }
 

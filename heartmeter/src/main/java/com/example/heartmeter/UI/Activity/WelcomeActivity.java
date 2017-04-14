@@ -6,9 +6,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.heartmeter.R;
-import com.example.heartmeter.Service.BTService;
 import com.example.heartmeter.Service.DBService;
 import com.example.heartmeter.Service.HubService;
+import com.presisco.shared.utils.LCAT;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -29,11 +29,14 @@ public class WelcomeActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
+
             startService(new Intent(WelcomeActivity.this, HubService.class));
-            startService(new Intent(WelcomeActivity.this, BTService.class));
+            //startService(new Intent(WelcomeActivity.this, BTService.class));
             startService(new Intent(WelcomeActivity.this, DBService.class));
+            LCAT.d(this, "services started");
             try {
                 Thread.sleep(2000);
+                LCAT.d(this, "finished waiting");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

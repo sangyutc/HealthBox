@@ -28,6 +28,8 @@ public abstract class MonitorPanelFragment extends Fragment {
 
     public abstract void redraw();
 
+    public abstract void clear();
+
     public void setViewCreatedListener(ViewCreatedListener viewCreatedListener) {
         mViewCreated = viewCreatedListener;
     }

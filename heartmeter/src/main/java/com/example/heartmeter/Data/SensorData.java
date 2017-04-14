@@ -1,5 +1,7 @@
 package com.example.heartmeter.Data;
 
+import android.util.Log;
+
 /**
  * Created by presisco on 2017/4/12.
  */
@@ -13,6 +15,7 @@ public class SensorData {
     public int ra_detach;
     public int la_detach;
     public int heart_rate;
+    public int ecg;
 
     public SensorData() {
     }
@@ -26,6 +29,10 @@ public class SensorData {
         sensorData.la_detach = (packet[1] & 0x02) >>> 1;
         sensorData.heart_rate = (packet[1] & 0x01) << 8;
         sensorData.heart_rate += (int) packet[2] & 0xFF;
+        sensorData.ecg = ((packet[3] & 0xFF) << 8) + (packet[4] & 0xFF);
+        if (sensorData.ecg > 0xFFFF) {
+            Log.d("parseDataPacket()", "ECG Overflow");
+        }
         return sensorData;
     }
 }

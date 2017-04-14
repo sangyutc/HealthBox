@@ -67,7 +67,6 @@ public class BTBoxActivity extends AppCompatActivity {
                         sampleRate = HubService.SAMPLERATE_250HZ;
                         break;
                     case 2:
-
                         sampleRate = HubService.SAMPLERATE_500HZ;
                         break;
                 }

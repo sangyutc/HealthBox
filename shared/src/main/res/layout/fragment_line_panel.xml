@@ -4,35 +4,33 @@
     android:layout_height="match_parent"
     tools:context=".ui.framework.monitor.LinePanelFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/textTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_weight="1"
+        android:text="TextTitle"
+        android:textSize="@dimen/value_panel_title_fontsize"
+        android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/textTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="TextTitle"
-            android:textSize="@dimen/value_panel_title_fontsize" />
+    <TextView
+        android:id="@+id/textHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="TextView"
+        android:textSize="@dimen/value_panel_hint_fontsize" />
 
-        <TextView
-            android:id="@+id/textHint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="TextView"
-            android:textSize="@dimen/value_panel_hint_fontsize" />
+    <view
+        android:id="@+id/lineChart"
+        class="lecho.lib.hellocharts.view.LineChartView"
+        id="@+id/view2"
+        layout_weight="1"
+        layout_width="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="402dp"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/textHint"
+        android:layout_weight="1" />
 
-
-        <view
-            android:id="@+id/lineChart"
-            class="lecho.lib.hellocharts.view.LineChartView"
-            id="@+id/view2"
-            layout_weight="1"
-            layout_width="match_parent"
-            android:layout_width="wrap_content"
-            android:layout_height="360dp" />
-    </LinearLayout>
 </RelativeLayout>

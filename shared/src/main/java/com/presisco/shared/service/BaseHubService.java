@@ -17,6 +17,7 @@ public abstract class BaseHubService extends Service {
     public static final String ACTION_DATA_FILTERED = "com.presisco.shared.service.DATA_FILTERED";
     public static final String ACTION_DATA_REDUCED = "com.presisco.shared.service.DATA_REDUCED";
 
+    public static final String KEY_TYPE = "TYPE";
     public static final String KEY_DATA = "DATA";
 
     LocalBroadcastManager mLocalBroadcastManager;
@@ -24,14 +25,9 @@ public abstract class BaseHubService extends Service {
     public BaseHubService() {
     }
 
-    protected void broadcast(String action, Integer data) {
+    protected void broadcast(int type, String action, Integer data) {
         Intent intent = new Intent(action);
-        intent.putExtra(KEY_DATA, data);
-        mLocalBroadcastManager.sendBroadcast(intent);
-    }
-
-    protected void broadcast(String action, Integer[] data) {
-        Intent intent = new Intent(action);
+        intent.putExtra(KEY_TYPE, type);
         intent.putExtra(KEY_DATA, data);
         mLocalBroadcastManager.sendBroadcast(intent);
     }
@@ -40,16 +36,23 @@ public abstract class BaseHubService extends Service {
         mLocalBroadcastManager.registerReceiver(receiver, filter);
     }
 
-    protected void broadcastRaw(Integer[] data) {
-        broadcast(ACTION_DATA_RAW, data);
+    protected void broadcast(int type, String action, int[] data) {
+        Intent intent = new Intent(action);
+        intent.putExtra(KEY_TYPE, type);
+        intent.putExtra(KEY_DATA, data);
+        mLocalBroadcastManager.sendBroadcast(intent);
     }
 
-    protected void broadcastFiltered(Integer[] data) {
-        broadcast(ACTION_DATA_FILTERED, data);
+    protected void broadcastRaw(int type, int[] data) {
+        broadcast(type, ACTION_DATA_RAW, data);
     }
 
-    protected void broadcastReduced(Integer data) {
-        broadcast(ACTION_DATA_REDUCED, data);
+    protected void broadcastFiltered(int type, int[] data) {
+        broadcast(type, ACTION_DATA_FILTERED, data);
+    }
+
+    protected void broadcastReduced(int type, Integer data) {
+        broadcast(type, ACTION_DATA_REDUCED, data);
     }
 
     @Override

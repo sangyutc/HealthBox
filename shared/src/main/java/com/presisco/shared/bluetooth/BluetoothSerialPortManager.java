@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.presisco.shared.utils.LCAT;
 
@@ -45,8 +44,8 @@ public class BluetoothSerialPortManager {
 
     UUID mUUID = BT_UUID_SERIAL;
     int mDevType = DEV_TYPE_BYTE;
-    ConnectTask mConnectTask = new ConnectTask();
-    ReceiverTask mReceiverTask = new ReceiverTask();
+    ConnectTask mConnectTask;
+    ReceiverTask mReceiverTask;
 
     public BluetoothSerialPortManager(Context context) {
         mContext = context;
@@ -137,6 +136,7 @@ public class BluetoothSerialPortManager {
 
     public void connectAddress(String address) {
         mBTDevice = mBTAdapter.getRemoteDevice(address);
+        mConnectTask = new ConnectTask();
         mConnectTask.execute(mBTDevice);
     }
 
@@ -145,6 +145,7 @@ public class BluetoothSerialPortManager {
             String devName = device.getName();
             if (devName.equals(name)) {
                 mBTDevice = device;
+                mConnectTask = new ConnectTask();
                 mConnectTask.execute(mBTDevice);
             }
         }
@@ -152,7 +153,10 @@ public class BluetoothSerialPortManager {
 
     public void send(byte[] data) {
         try {
-            mOutputStream.write(data);
+            if (mOutputStream != null) {
+                mOutputStream.write(data);
+                mOutputStream.flush();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             mBTStateListener.disconnected();
@@ -160,22 +164,11 @@ public class BluetoothSerialPortManager {
     }
 
     public void send(byte data) {
-        try {
-            if (mOutputStream != null)
-                mOutputStream.write((int) data & 0xFF);
-        } catch (IOException e) {
-            e.printStackTrace();
-            mBTStateListener.disconnected();
-        }
+        send(new byte[]{data});
     }
 
     public void send(String data) {
-        try {
-            mOutputStream.write(data.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-            mBTStateListener.disconnected();
-        }
+        send(data.getBytes());
     }
 
     public void disconnect() {
@@ -216,7 +209,7 @@ public class BluetoothSerialPortManager {
     private class ConnectTask extends AsyncTask<BluetoothDevice, Void, BluetoothSocket> {
         @Override
         protected void onPreExecute() {
-            Log.d(this.toString(), "prepare connecting");
+            LCAT.d(this, "prepare connecting");
         }
 
         @Override
@@ -226,8 +219,9 @@ public class BluetoothSerialPortManager {
                 mBTStateListener.connectFailed();
                 return;
             }
-            Log.d(this.toString(), "finished connecting");
+            LCAT.d(this, "finished connecting");
             try {
+                mReceiverTask = new ReceiverTask();
                 mReceiverTask.execute(bluetoothSocket.getInputStream());
                 mOutputStream = bluetoothSocket.getOutputStream();
                 mBTStateListener.connected();
@@ -240,7 +234,7 @@ public class BluetoothSerialPortManager {
 
         @Override
         protected BluetoothSocket doInBackground(BluetoothDevice... devices) {
-            Log.d(this.toString(), "start connecting");
+            LCAT.d(this, "start connecting");
             BluetoothSocket socket;
             try {
                 socket = devices[0].createRfcommSocketToServiceRecord(mUUID);
@@ -270,17 +264,17 @@ public class BluetoothSerialPortManager {
     private class ReceiverTask extends AsyncTask<InputStream, Void, Integer> {
         @Override
         protected void onPreExecute() {
-            Log.d(this.toString(), "prepare receiving");
+            LCAT.d(this, "prepare receiving");
         }
 
         @Override
         protected void onPostExecute(Integer i) {
-            Log.d(this.toString(), "closed receiving");
+            LCAT.d(this, "closed receiving");
         }
 
         @Override
         protected Integer doInBackground(InputStream... params) {
-            Log.d(this.toString(), "started receiving");
+            LCAT.d(this, "started receiving");
             InputStream inStream = params[0];
             Integer resultCode = RESULT_CODE_EXIT;
             try {

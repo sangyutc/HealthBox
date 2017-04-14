@@ -58,6 +58,11 @@ public class ValuePanelFragment extends MonitorPanelFragment {
     }
 
     @Override
+    public void clear() {
+        mValue.setText("");
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(this.toString(), "onCreate()");
