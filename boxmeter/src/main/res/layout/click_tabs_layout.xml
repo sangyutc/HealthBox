@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/click_tabs_scroll" />
 
-    <com.presisco.shared.UI.framework.clicktabslayout.ClickTabsContainer
+    <com.presisco.shared.ui.framework.clicktabslayout.ClickTabsContainer
         android:id="@+id/click_tabs_scroll"
         android:layout_width="match_parent"
         android:layout_height="@dimen/click_tabs_layout_tabs_height"

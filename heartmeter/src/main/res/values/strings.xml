@@ -27,8 +27,8 @@
 
     <string-array name="realtime_modes">
         <item>心率显示</item>
-        <item>心率曲线 2秒</item>
-        <item>心电曲线 2秒</item>
+        <item>心率曲线 1分钟</item>
+        <item>心电曲线 5秒</item>
         <item>有氧运动</item>
     </string-array>
 

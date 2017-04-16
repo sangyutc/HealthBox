@@ -17,11 +17,13 @@ import android.widget.Spinner;
 
 import com.presisco.boxmeter.R;
 import com.presisco.boxmeter.Service.HubService;
-import com.presisco.shared.service.BaseHubService;
 import com.presisco.shared.ui.framework.monitor.LinePanelFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
 import com.presisco.shared.ui.framework.monitor.ValuePanelFragment;
+import com.presisco.shared.utils.ByteUtils;
+
+import lecho.lib.hellocharts.util.ChartUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +39,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
 
     private int currrent_mode_id = 0;
     private MonitorPanelFragment mCurrentPanel;
+    private BroadcastReceiver mCurrentReceiver;
 
     public RealtimeFragment() {
     }
@@ -52,14 +55,14 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
         return fragment;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getContext());
-        mLocalBroadcastManager.registerReceiver(new RateReceiver(), new IntentFilter(BaseHubService.ACTION_DATA_REDUCED));
-        //mLocalBroadcastManager.registerReceiver();
         modes = getResources().getStringArray(R.array.realtime_modes);
         hints = getResources().getStringArray(R.array.realtime_mode_hints);
+
     }
 
     @Override
@@ -78,14 +81,32 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id) {
                 currrent_mode_id = pos;
+                mLocalBroadcastManager.unregisterReceiver(mCurrentReceiver);
+                String action = "";
                 switch (pos) {
                     case 0:
+                    case 4:
+                        action = HubService.ACTION_SPO2H;
+                        mCurrentReceiver = new SPO2HReceiver();
                         mMonitorHost.displayPanel(MonitorHostFragment.PANEL_VALUE);
                         break;
                     case 1:
+                        action = HubService.ACTION_PULSE;
+                        mCurrentReceiver = new PulseReceiver();
+                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_VALUE);
+                        break;
+                    case 2:
+                        action = HubService.ACTION_SPO2H_VOLUME;
+                        mCurrentReceiver = new SPO2HVolumeReceiver();
+                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
+                        break;
+                    case 3:
+                        action = HubService.ACTION_PULSE_VOLUME;
+                        mCurrentReceiver = new PulseVolumeReceiver();
                         mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
                         break;
                 }
+                mLocalBroadcastManager.registerReceiver(mCurrentReceiver, new IntentFilter(action));
             }
 
             @Override
@@ -94,6 +115,25 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             }
         });
         mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, modes));
+
+        rootView.findViewById(R.id.buttonStart).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLocalBroadcastManager.sendBroadcast(
+                        new Intent(HubService.ACTION_SEND_INSTRUCTION)
+                                .putExtra(HubService.KEY_DATA, HubService.SEND_START));
+                mCurrentPanel.clear();
+            }
+        });
+        rootView.findViewById(R.id.buttonStop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLocalBroadcastManager.sendBroadcast(
+                        new Intent(HubService.ACTION_SEND_INSTRUCTION)
+                                .putExtra(HubService.KEY_DATA, HubService.SEND_STOP));
+            }
+        });
+
         return rootView;
     }
 
@@ -105,34 +145,85 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     @Override
     public void panelViewCreated(MonitorPanelFragment panel) {
         mCurrentPanel = panel;
+        mCurrentPanel.clear();
         mCurrentPanel.setTitle(modes[currrent_mode_id]);
         mCurrentPanel.setHint(hints[currrent_mode_id]);
         switch (currrent_mode_id) {
-            case 0:
+            case 2:
+                LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
+                linePanel.setAxisYScale(0, 100);
+                linePanel.setMaxPoints(6000);
+                linePanel.setAxisXText("Time");
+                linePanel.setAxisYText("Rate");
+                LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
+                style.line_color = ChartUtils.COLOR_BLUE;
+                style.has_points = false;
+                linePanel.setLineStyle(style);
+                linePanel.redraw();
                 break;
-            case 1:
-                ((LinePanelFragment) mCurrentPanel).setAxisXText("Sequence");
-                ((LinePanelFragment) mCurrentPanel).setAxisYText("Value");
+            case 3:
+                linePanel = (LinePanelFragment) mCurrentPanel;
+                linePanel.setAxisYScale(0, 240);
+                linePanel.setMaxPoints(6000);
+                linePanel.setAxisXText("Time");
+                linePanel.setAxisYText("Rate");
+                style = new LinePanelFragment.LineStyle();
+                style.line_color = ChartUtils.COLOR_BLUE;
+                style.has_points = false;
+                linePanel.setLineStyle(style);
+                linePanel.redraw();
                 break;
         }
     }
 
-    private void updatePanel(int data) {
-        switch (currrent_mode_id) {
-            case 0:
-            case 1:
-                if (mCurrentPanel != null) {
-                    ((ValuePanelFragment) mCurrentPanel).setValue(data + "");
-                }
-                break;
-        }
-    }
-
-    private class RateReceiver extends BroadcastReceiver {
+    private class SPO2HReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            updatePanel(intent.getIntExtra(HubService.KEY_DATA, 0));
+            switch (currrent_mode_id) {
+                case 0:
+                case 4:
+                    ((ValuePanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    break;
+            }
+        }
+    }
 
+    private class PulseReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (currrent_mode_id) {
+                case 1:
+                    ((ValuePanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    break;
+            }
+        }
+    }
+
+    private class SPO2HVolumeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
+            switch (currrent_mode_id) {
+                case 2:
+                    int[] ecg_data = intent.getIntArrayExtra(HubService.KEY_DATA);
+                    float[] converted = ByteUtils.intArray2floatArray(ecg_data);
+                    linePanel.appendValue(converted);
+                    break;
+            }
+        }
+    }
+
+    private class PulseVolumeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
+            switch (currrent_mode_id) {
+                case 3:
+                    int[] ecg_data = intent.getIntArrayExtra(HubService.KEY_DATA);
+                    float[] converted = ByteUtils.intArray2floatArray(ecg_data);
+                    linePanel.appendValue(converted);
+                    break;
+            }
         }
     }
 

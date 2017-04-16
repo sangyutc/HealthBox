@@ -147,8 +147,10 @@ public class BluetoothSerialPortManager {
                 mBTDevice = device;
                 mConnectTask = new ConnectTask();
                 mConnectTask.execute(mBTDevice);
+                return;
             }
         }
+        LCAT.d(this, "target: " + name + " not found!");
     }
 
     public void send(byte[] data) {
@@ -293,10 +295,7 @@ public class BluetoothSerialPortManager {
                             for (int i = 0; i < length; ++i) {
                                 packet[i] = blockBuffer[i];
                             }
-                            //int length = (byte) inStream.read(buffer);
-                            if (mDevType == DEV_TYPE_BYTE) {
-                                mBlockListener.received(packet);
-                            }
+                            mBlockListener.received(packet);
                         }
                 }
             } catch (IOException e) {

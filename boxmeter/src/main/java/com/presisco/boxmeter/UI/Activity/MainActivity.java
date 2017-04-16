@@ -1,8 +1,6 @@
 package com.presisco.boxmeter.UI.Activity;
 
-import android.app.Service;
 import android.content.ComponentName;
-import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -75,12 +73,10 @@ public class MainActivity extends AppCompatActivity {
         mClickTabsFramework.setContentItems(getContentFragments());
         mClickTabsFramework.setDistributeEvenly(true);
         mClickTabsFramework.setCustomTabDraw(new TabsDraw());
-        mClickTabsFramework.setID(R.layout.click_tabs_item, R.layout.click_tabs_item, R.id.click_tabs_scroll, R.id.contentFrame);
+        mClickTabsFramework.setID(R.layout.click_tabs_layout, R.layout.click_tabs_item, R.id.click_tabs_scroll, R.id.contentFrame);
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         trans.replace(R.id.TabsLayoutHost, mClickTabsFramework);
         trans.commit();
-
-        bindService(new Intent(this, DBService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
     }
 
     private static class ContentPage {

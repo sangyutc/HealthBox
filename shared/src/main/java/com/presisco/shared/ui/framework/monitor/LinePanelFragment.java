@@ -171,9 +171,9 @@ public class LinePanelFragment extends MonitorPanelFragment {
             mHint.setText(mHintText);
         }
 
-        mViewCreated.panelViewCreated(this);
-
         mLineChart = (LineChartView) rootView.findViewById(R.id.lineChart);
+
+        mViewCreated.panelViewCreated(this);
 
         initLineChart();
 
@@ -206,39 +206,6 @@ public class LinePanelFragment extends MonitorPanelFragment {
         v.right = mMaxPoints;
         mLineChart.setMaximumViewport(v);
         mLineChart.setCurrentViewport(v);
-    }
-
-    private void generateData() {
-
-        List<Line> lines = new ArrayList<Line>();
-        List<PointValue> values = new ArrayList<PointValue>();
-        for (int j = 0; j < 100; ++j) {
-            values.add(new PointValue(j, (float) (60 + Math.random() * 60f)));
-        }
-
-        Line line = new Line(values);
-        line.setColor(ChartUtils.COLORS[0]);
-        line.setShape(ValueShape.CIRCLE);
-        line.setCubic(false);
-        line.setFilled(false);
-        line.setHasLabels(false);
-        line.setHasLabelsOnlyForSelected(false);
-        line.setHasLines(true);
-        line.setHasPoints(false);
-        //line.setHasGradientToTransparent(hasGradientToTransparent);
-        lines.add(line);
-
-        mLineData = new LineChartData(lines);
-
-        Axis axisX = new Axis();
-        Axis axisY = new Axis().setHasLines(true);
-        axisX.setName(mAxisXText);
-        axisY.setName(mAxisYText);
-        mLineData.setAxisXBottom(axisX);
-        mLineData.setAxisYLeft(axisY);
-
-        mLineData.setBaseValue(Float.NEGATIVE_INFINITY);
-
     }
 
     public static class LineStyle {

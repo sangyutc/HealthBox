@@ -61,13 +61,13 @@ public class BTBoxActivity extends AppCompatActivity {
                 byte sampleRate = 0;
                 switch (position) {
                     case 0:
-                        sampleRate = HubService.SAMPLERATE_100HZ;
+                        sampleRate = HubService.SAMPLE_RATE_100HZ;
                         break;
                     case 1:
-                        sampleRate = HubService.SAMPLERATE_250HZ;
+                        sampleRate = HubService.SAMPLE_RATE_250HZ;
                         break;
                     case 2:
-                        sampleRate = HubService.SAMPLERATE_500HZ;
+                        sampleRate = HubService.SAMPLE_RATE_500HZ;
                         break;
                 }
                 intent.putExtra(HubService.KEY_SAMPLE_RATE, sampleRate);

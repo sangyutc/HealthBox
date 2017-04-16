@@ -7,6 +7,8 @@
     <string name="title_history">历史记录</string>
     <string name="label_monitor_mode">监控模式</string>
     <string name="label_history_mode">历史模式</string>
+    <string name="label_start">开始</string>
+    <string name="label_stop">停止</string>
 
     <string-array name="title_warning_bt">
         <item>警告：</item>
@@ -24,12 +26,18 @@
     </string-array>
 
     <string-array name="realtime_modes">
-        <item>通用</item>
+        <item>实时血氧</item>
+        <item>实时脉率</item>
+        <item>血氧曲线 1分钟</item>
+        <item>脉率曲线 1分钟</item>
         <item>有氧运动</item>
     </string-array>
 
     <string-array name="realtime_mode_hints">
-        <item>默认模式</item>
+        <item>显示实时血氧状况</item>
+        <item>显示实时脉率状况</item>
+        <item>显示一段时间内的血氧状况</item>
+        <item>显示一段时间内的脉率状况</item>
         <item>慢跑，游泳等</item>
     </string-array>
 

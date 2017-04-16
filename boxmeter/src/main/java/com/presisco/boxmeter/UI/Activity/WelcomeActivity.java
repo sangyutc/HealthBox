@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.presisco.boxmeter.R;
-import com.presisco.boxmeter.Service.BTService;
 import com.presisco.boxmeter.Service.DBService;
 import com.presisco.boxmeter.Service.HubService;
 
@@ -31,7 +30,6 @@ public class WelcomeActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             try {
                 startService(new Intent(WelcomeActivity.this, HubService.class));
-                startService(new Intent(WelcomeActivity.this, BTService.class));
                 startService(new Intent(WelcomeActivity.this, DBService.class));
                 Thread.sleep(2000);
             } catch (InterruptedException e) {

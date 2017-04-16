@@ -3,11 +3,13 @@ package com.presisco.boxmeter.UI.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.presisco.boxmeter.R;
+import com.presisco.boxmeter.Service.BTService;
 import com.presisco.boxmeter.UI.Activity.BTBoxActivity;
 
 /**
@@ -37,6 +39,12 @@ public class PersonalFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_personal, container, false);
         rootView.findViewById(R.id.buttonToolbox).setOnClickListener(new BTToolboxBtnListener());
+        rootView.findViewById(R.id.buttonReconnect).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(BTService.ACTION_TARGET_CONNECT));
+            }
+        });
         return rootView;
     }
 

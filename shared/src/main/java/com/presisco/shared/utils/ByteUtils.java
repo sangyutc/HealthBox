@@ -95,4 +95,17 @@ public class ByteUtils {
         int extended = data & 0x0F;
         return (extended ^ mask) == 0;
     }
+
+    public static boolean getBit(byte data, int pos) {
+        int cursor = 0x01 << pos;
+        return (data & cursor) > 0;
+    }
+
+    public static int getHigherByte(byte data) {
+        return data & 0xF0;
+    }
+
+    public static int getLowerByte(byte data) {
+        return data & 0x0F;
+    }
 }
