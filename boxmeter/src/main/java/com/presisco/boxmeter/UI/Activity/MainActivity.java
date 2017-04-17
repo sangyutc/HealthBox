@@ -1,10 +1,7 @@
 package com.presisco.boxmeter.UI.Activity;
 
-import android.content.ComponentName;
-import android.content.ServiceConnection;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.presisco.boxmeter.R;
-import com.presisco.boxmeter.Service.DBService;
 import com.presisco.boxmeter.UI.Fragment.HistoryFragment;
 import com.presisco.boxmeter.UI.Fragment.PersonalFragment;
 import com.presisco.boxmeter.UI.Fragment.RealtimeFragment;
@@ -26,8 +22,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ClickTabsFramework mClickTabsFramework;
     private ContentPage[] mContentPages;
-    private DBService mDBService;
-    private DBServiceConnection mServiceConnection = new DBServiceConnection();
 
     private void prepareContentPages() {
         Resources res = getResources();
@@ -112,18 +106,6 @@ public class MainActivity extends AppCompatActivity {
             }
             now.setBackgroundColor(mContentPages[pos].mColor);
             ((ImageView) now.findViewById(R.id.tabIcon)).setImageResource(mContentPages[pos].mIcon2);
-        }
-    }
-
-    private class DBServiceConnection implements ServiceConnection {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mDBService = ((DBService.DBServiceBinder) service).getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
         }
     }
 }

@@ -11,12 +11,13 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.example.heartmeter.Data.SensorData;
+import com.example.heartmeter.R;
 import com.presisco.shared.service.BaseBluetoothService;
 import com.presisco.shared.service.BaseHubService;
 import com.presisco.shared.utils.ByteUtils;
 import com.presisco.shared.utils.LCAT;
+import com.presisco.shared.utils.ValueUtils;
 
-import java.util.ArrayList;
 import java.util.concurrent.Executors;
 
 public class HubService extends BaseHubService implements BaseBluetoothService.PacketReceivedListener {
@@ -26,8 +27,9 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     public static final String KEY_FILTER = "FILTER";
 
     public static final String ACTION_HEARTRATE_REDUCED = "HEARTRATE_REDUCED";
-    public static final String ACTION_HEARTRATE_VOLUME = "HEARTRATE_VOLUMN";
+    public static final String ACTION_HEARTRATE_VOLUME = "HEARTRATE_VOLUME";
     public static final String ACTION_ECG = "ECG";
+    public static final String ACTION_PROBE_DETACH = "PROBE_DETACH";
     public static final int TYPE_HEARTRATE = 0;
     public static final int TYPE_ECG = 1;
     public static final byte SAMPLE_RATE_100HZ = 0x01;
@@ -43,6 +45,13 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     private static final int MAX_SAMPLE_RATE = 500;
     private static final int HEAD_DATA = 0xA0;
     private static final int HEAD_RESPONSE = 0xC0;
+
+    private static final int ROOF_HEARTRATE = 250;
+    private static final int ROOF_ECG = 255;
+    private static final int FLOOR_HEARTRATE = 0;
+    private static final int FLOOR_ECG = 0;
+
+    private static final int ID_PROBE_DETACH = 0;
 
     int mInstructionIdCounter = 1;
     int mSampleRate = 100;
@@ -133,26 +142,27 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
         }
     }
 
-    private boolean isValidData(SensorData data) {
-        return data.status == SensorData.STATUS_NORMAL;
-    }
+    @Override
+    protected void analyseGroup() {
+        int error = 0;
+        int heartrate_sum = 0;
+        for (int i = 0; i < mSampleRate; ++i) {
+            if (raw_data[i].la_detach
+                    || raw_data[i].ra_detach
+                    || raw_data[i].status != SensorData.STATUS_NORMAL) {
+                error++;
+            }
 
-    private boolean isValidHeartrate(SensorData data) {
-        if (data.heart_rate < 20) {
-            return false;
+            heartrate_sum += ValueUtils.limit(raw_data[i].heart_rate, ROOF_HEARTRATE, FLOOR_HEARTRATE);
+            raw_ecg[i] = ValueUtils.limit(raw_ecg[i], ROOF_ECG, FLOOR_ECG);
         }
-        return data.heart_rate <= 180;
-    }
 
-    private int reduceHeartrate(ArrayList<Integer> data) {
-        int sum = 0;
-        for (Integer point : data) {
-            sum += point;
-        }
-        if (data.size() == 0) {
-            return -1;
+        if (error < mSampleRate / 5) {
+            broadcast(ACTION_ECG, raw_ecg);
+            broadcast(ACTION_HEARTRATE_REDUCED, heartrate_sum / mSampleRate);
         } else {
-            return sum / data.size();
+            sendNotification(ID_PROBE_DETACH, R.drawable.ic_launcher, "Probe Detached", "Make sure probe connected");
+            broadcast(ACTION_PROBE_DETACH);
         }
     }
 
@@ -162,10 +172,7 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
             LCAT.d(this, "received response packet: " + ByteUtils.bytes2hex(packet));
         } else {
             if (data_packet_counter >= mSampleRate) {
-                broadcast(ACTION_HEARTRATE_VOLUME, raw_heartrate);
-                broadcast(ACTION_ECG, raw_ecg);
-                broadcast(ACTION_HEARTRATE_REDUCED, raw_data[0].heart_rate);
-
+                analyseGroup();
                 data_packet_counter = 0;
             }
             SensorData data = SensorData.parseDataPacket(packet);

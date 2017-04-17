@@ -76,7 +76,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
         trans.replace(R.id.monitorHost, mMonitorHost);
         trans.commit();
 
-        mModeSpinner = (Spinner) rootView.findViewById(R.id.modeSpinner);
+        mModeSpinner = (Spinner) rootView.findViewById(R.id.spinnerMode);
         mModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
@@ -148,7 +148,8 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             case 1:
                 LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
                 linePanel.setAxisYScale(0, 250);
-                linePanel.setMaxPoints(6000);
+                linePanel.setMaxPoints(60);
+                linePanel.setXStep(1);
                 linePanel.setAxisXText("Time");
                 linePanel.setAxisYText("Rate");
                 LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
@@ -161,6 +162,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
                 linePanel = (LinePanelFragment) mCurrentPanel;
                 linePanel.setAxisYScale(0, 1500);
                 linePanel.setMaxPoints(500);
+                linePanel.setXStep(0.01f);
                 linePanel.setAxisXText("Time");
                 linePanel.setAxisYText("Voltage");
                 style = new LinePanelFragment.LineStyle();

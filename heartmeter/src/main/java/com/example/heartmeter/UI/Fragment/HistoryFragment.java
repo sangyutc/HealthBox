@@ -23,6 +23,8 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
     private String[] modes;
     private String[] hints;
     private Spinner mModeSpinner;
+    private Spinner mEventSpinner;
+    private ArrayAdapter<String> mAdapter;
     private MonitorHostFragment mMonitorHost;
 
     private int currrent_mode_id = 0;
@@ -62,7 +64,7 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
         trans.replace(R.id.monitorHost, mMonitorHost);
         trans.commit();
 
-        mModeSpinner = (Spinner) rootView.findViewById(R.id.modeSpinner);
+        mModeSpinner = (Spinner) rootView.findViewById(R.id.spinnerMode);
         mModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
@@ -70,10 +72,8 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
                 currrent_mode_id = pos;
                 switch (pos) {
                     case 0:
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
                         break;
                     case 1:
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
                         break;
                 }
             }
@@ -84,6 +84,19 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
             }
         });
         mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, modes));
+
+        mEventSpinner = (Spinner) rootView.findViewById(R.id.spinnerEvent);
+        mEventSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         return rootView;
     }
 

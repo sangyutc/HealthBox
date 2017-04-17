@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.presisco.boxmeter.R;
-import com.presisco.boxmeter.Service.DBService;
 import com.presisco.boxmeter.Service.HubService;
+
+import java.util.concurrent.Executors;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -15,7 +16,7 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-        new IgniteTask().execute();
+        new IgniteTask().executeOnExecutor(Executors.newSingleThreadExecutor());
     }
 
     private class IgniteTask extends AsyncTask<Void, Void, Void> {
@@ -28,9 +29,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
+            startService(new Intent(WelcomeActivity.this, HubService.class));
             try {
-                startService(new Intent(WelcomeActivity.this, HubService.class));
-                startService(new Intent(WelcomeActivity.this, DBService.class));
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();

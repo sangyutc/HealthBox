@@ -10,9 +10,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.presisco.boxmeter.Data.SensorData;
+import com.presisco.boxmeter.R;
 import com.presisco.shared.service.BaseBluetoothService;
 import com.presisco.shared.service.BaseHubService;
 import com.presisco.shared.utils.LCAT;
+import com.presisco.shared.utils.ValueUtils;
 
 public class HubService extends BaseHubService implements BaseBluetoothService.PacketReceivedListener {
     public static final int SEND_START = 0;
@@ -21,6 +23,15 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     public static final String ACTION_PULSE = "PULSE";
     public static final String ACTION_SPO2H_VOLUME = "SPO2H_VOLUME";
     public static final String ACTION_PULSE_VOLUME = "PULSE_VOLUME";
+    public static final String ACTION_PROBE_TIMEOUT = "PROBE_TIMEOUT";
+
+    private static final int ID_PROBE_TIMEOUT = 0;
+
+    private static final int ROOF_SPO2H = 99;
+    private static final int ROOF_PULSE = 250;
+    private static final int FLOOR_SPO2H = 25;
+    private static final int FLOOR_PULSE = 0;
+
     private static final int SAMPLE_RATE = 100;
     BTServiceConnection mConnection = new BTServiceConnection();
     BaseBluetoothService mBTService;
@@ -51,7 +62,6 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     @Override
     public void onCreate() {
         super.onCreate();
-        //registerLocalReceiver(new BTServiceReceiver(), new IntentFilter(BaseBluetoothService.ACTION_TARGET_DATA_RECEIVED));
         registerLocalReceiver(new HubHostReceiver(), new IntentFilter(ACTION_SEND_INSTRUCTION));
         bindService(new Intent(this, BTService.class), mConnection, Context.BIND_AUTO_CREATE);
     }
@@ -69,15 +79,39 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     }
 
     @Override
+    protected void analyseGroup() {
+        int probe_timeout = 0;
+        int spo2h_sum = 0;
+        int pulse_sum = 0;
+        for (int i = 0; i < SAMPLE_RATE; ++i) {
+            if (raw_data[i].search_timeout) {
+                probe_timeout++;
+            }
+
+            spo2h_sum += ValueUtils.limit(raw_data[i].spo2h, ROOF_SPO2H, FLOOR_SPO2H);
+            spo2h_volume[i] = ValueUtils.limit(spo2h_volume[i], ROOF_SPO2H, FLOOR_SPO2H);
+
+            pulse_sum += ValueUtils.limit(raw_data[i].pulse_rate, ROOF_PULSE, FLOOR_PULSE);
+        }
+
+        if (probe_timeout < SAMPLE_RATE / 5) {
+            broadcast(ACTION_SPO2H_VOLUME, spo2h_volume);
+            broadcast(ACTION_PULSE_VOLUME, pulse_volume);
+            broadcast(ACTION_SPO2H, spo2h_sum / SAMPLE_RATE);
+            broadcast(ACTION_PULSE, pulse_sum / SAMPLE_RATE);
+        } else {
+            sendNotification(ID_PROBE_TIMEOUT, R.drawable.ic_launcher, "Probe Timeout", "Make sure there's a finger");
+            broadcast(ACTION_PROBE_TIMEOUT);
+        }
+    }
+
+    @Override
     public void onReceived(byte[] packet) {
         if (!is_listening) {
             return;
         }
         if (data_packet_counter >= SAMPLE_RATE) {
-            broadcast(ACTION_SPO2H_VOLUME, spo2h_volume);
-            broadcast(ACTION_PULSE_VOLUME, pulse_volume);
-            broadcast(ACTION_SPO2H, raw_data[0].spo2h);
-            broadcast(ACTION_PULSE, raw_data[0].pulse_rate);
+            analyseGroup();
             data_packet_counter = 0;
         } else {
             SensorData data = SensorData.parseDataPacket(packet);

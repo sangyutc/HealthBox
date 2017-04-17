@@ -32,11 +32,6 @@
             android:exported="true" />
 
         <service
-            android:name=".Service.DBService"
-            android:enabled="true"
-            android:exported="true" />
-
-        <service
             android:name=".Service.NetService"
             android:enabled="true"
             android:exported="true" />

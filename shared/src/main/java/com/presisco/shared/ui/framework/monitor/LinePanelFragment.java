@@ -46,6 +46,7 @@ public class LinePanelFragment extends MonitorPanelFragment {
     private float mAxisYMin = 0;
     private float mAxisYMax = 100;
     private float mLastXCoord = 0;
+    private float mXStep = 1;
 
     private LineStyle mLineStyle = new LineStyle();
 
@@ -88,23 +89,30 @@ public class LinePanelFragment extends MonitorPanelFragment {
         mLineStyle = lineStyle;
     }
 
-    public void appendValue(float value) {
-
+    public void setXStep(float step) {
+        mXStep = step;
     }
 
-    public void appendValue(float[] values) {
-        for (int i = 1; i < values.length; ++i) {
-            mPoints.add(new PointValue(mLastXCoord++, values[i]));
-            if (mPoints.size() > mMaxPoints) {
-                mPoints.remove(i - 1);
-            }
+    public void appendValue(float value) {
+        mPoints.add(new PointValue(mLastXCoord + mXStep, value));
+        if (mPoints.size() > mMaxPoints) {
+            mPoints.remove(0);
         }
+        mLastXCoord += mXStep;
         scrollViewport();
         initLineChart();
     }
 
-    public void appendValue(List<Float> value) {
-
+    public void appendValue(float[] values) {
+        for (int i = 1; i < values.length; ++i) {
+            mPoints.add(new PointValue(mLastXCoord + mXStep, values[i]));
+            if (mPoints.size() > mMaxPoints) {
+                mPoints.remove(0);
+            }
+        }
+        mLastXCoord += mXStep;
+        scrollViewport();
+        initLineChart();
     }
 
     @Override
@@ -186,11 +194,11 @@ public class LinePanelFragment extends MonitorPanelFragment {
         final Viewport v = new Viewport(mLineChart.getMaximumViewport());
         v.bottom = mAxisYMin;
         v.top = mAxisYMax;
-        if (mLastXCoord < mMaxPoints) {
+        if (mLastXCoord < mMaxPoints * mXStep) {
             v.left = 0;
-            v.right = mMaxPoints;
+            v.right = mMaxPoints * mXStep;
         } else {
-            v.left = mLastXCoord - mMaxPoints;
+            v.left = mLastXCoord - mMaxPoints * mXStep;
             v.right = mLastXCoord;
         }
         mLineChart.setMaximumViewport(v);
@@ -203,7 +211,7 @@ public class LinePanelFragment extends MonitorPanelFragment {
         v.bottom = mAxisYMin;
         v.top = mAxisYMax;
         v.left = 0;
-        v.right = mMaxPoints;
+        v.right = mMaxPoints * mXStep;
         mLineChart.setMaximumViewport(v);
         mLineChart.setCurrentViewport(v);
     }

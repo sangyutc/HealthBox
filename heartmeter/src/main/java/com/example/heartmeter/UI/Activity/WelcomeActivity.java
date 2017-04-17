@@ -6,9 +6,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.heartmeter.R;
-import com.example.heartmeter.Service.DBService;
 import com.example.heartmeter.Service.HubService;
-import com.presisco.shared.utils.LCAT;
+
+import java.util.concurrent.Executors;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -16,7 +16,7 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-        new IgniteTask().execute();
+        new IgniteTask().executeOnExecutor(Executors.newSingleThreadExecutor());
     }
 
     private class IgniteTask extends AsyncTask<Void, Void, Void> {
@@ -29,14 +29,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-
             startService(new Intent(WelcomeActivity.this, HubService.class));
-            //startService(new Intent(WelcomeActivity.this, BTService.class));
-            startService(new Intent(WelcomeActivity.this, DBService.class));
-            LCAT.d(this, "services started");
             try {
                 Thread.sleep(2000);
-                LCAT.d(this, "finished waiting");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

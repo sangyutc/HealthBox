@@ -1,9 +1,12 @@
 package com.presisco.shared.service;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.presisco.shared.utils.LCAT;
@@ -19,6 +22,7 @@ public abstract class BaseHubService extends Service {
     public static final String KEY_DATA = "DATA";
 
     LocalBroadcastManager mLocalBroadcastManager;
+    NotificationManager mNotificationManager;
 
     public BaseHubService() {
     }
@@ -32,6 +36,10 @@ public abstract class BaseHubService extends Service {
 
     protected void registerLocalReceiver(BroadcastReceiver receiver, IntentFilter filter) {
         mLocalBroadcastManager.registerReceiver(receiver, filter);
+    }
+
+    protected void broadcast(String action) {
+        mLocalBroadcastManager.sendBroadcast(new Intent(action));
     }
 
     protected void broadcast(String action, int[] data) {
@@ -66,6 +74,15 @@ public abstract class BaseHubService extends Service {
         broadcast(type, ACTION_DATA_REDUCED, data);
     }
 
+    protected void sendNotification(int id, int iconRes, String title, String content) {
+        mNotificationManager.notify(id
+                , new NotificationCompat.Builder(this)
+                        .setSmallIcon(iconRes)
+                        .setContentTitle(title)
+                        .setContentText(content)
+                        .build());
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
@@ -78,6 +95,7 @@ public abstract class BaseHubService extends Service {
     public void onCreate() {
         LCAT.d(this, "created");
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     /**
@@ -90,6 +108,11 @@ public abstract class BaseHubService extends Service {
     public void onDestroy() {
         super.onDestroy();
     }
+
+    /**
+     * 对接收到的1秒内的数据进行分析处理
+     */
+    protected abstract void analyseGroup();
 
     /**
      * 发送设备控制指令
