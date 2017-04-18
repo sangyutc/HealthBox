@@ -47,9 +47,9 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     private static final int HEAD_RESPONSE = 0xC0;
 
     private static final int ROOF_HEARTRATE = 250;
-    private static final int ROOF_ECG = 255;
+    private static final int ROOF_ECG = 600;
     private static final int FLOOR_HEARTRATE = 0;
-    private static final int FLOOR_ECG = 0;
+    private static final int FLOOR_ECG = 400;
 
     private static final int ID_PROBE_DETACH = 0;
 
@@ -57,9 +57,9 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     int mSampleRate = 100;
     BTServiceConnection mConnection = new BTServiceConnection();
     BaseBluetoothService mBTService;
-    private SensorData[] raw_data = new SensorData[MAX_SAMPLE_RATE];
-    private int[] raw_heartrate = new int[MAX_SAMPLE_RATE];
-    private int[] raw_ecg = new int[MAX_SAMPLE_RATE];
+    private SensorData[] raw_data;
+    private int[] raw_heartrate;
+    private int[] raw_ecg;
     private int data_packet_counter = 0;
 
     public HubService() {
@@ -115,12 +115,15 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
                 instruction[5] = intent.getByteExtra(KEY_SAMPLE_RATE, SAMPLE_RATE_100HZ);
                 switch (intent.getByteExtra(KEY_SAMPLE_RATE, SAMPLE_RATE_100HZ)) {
                     case SAMPLE_RATE_100HZ:
+                        LCAT.d(this, "sample rate change to 100");
                         mSampleRate = 100;
                         break;
                     case SAMPLE_RATE_250HZ:
+                        LCAT.d(this, "sample rate change to 250");
                         mSampleRate = 250;
                         break;
                     case SAMPLE_RATE_500HZ:
+                        LCAT.d(this, "sample rate change to 500");
                         mSampleRate = 500;
                         break;
                 }
@@ -213,6 +216,9 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
                 sendInstruction(new Intent()
                         .putExtra(KEY_INSTRUCTION, SEND_START));
                 data_packet_counter = 0;
+                raw_data = new SensorData[mSampleRate];
+                raw_ecg = new int[mSampleRate];
+                raw_heartrate = new int[mSampleRate];
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -95,7 +95,8 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
         }
 
         if (probe_timeout < SAMPLE_RATE / 5) {
-            broadcast(ACTION_SPO2H_VOLUME, spo2h_volume);
+            //broadcast(ACTION_SPO2H_VOLUME, spo2h_volume);
+            broadcast(ACTION_SPO2H_VOLUME, spo2h_sum / SAMPLE_RATE);
             broadcast(ACTION_PULSE_VOLUME, pulse_volume);
             broadcast(ACTION_SPO2H, spo2h_sum / SAMPLE_RATE);
             broadcast(ACTION_PULSE, pulse_sum / SAMPLE_RATE);

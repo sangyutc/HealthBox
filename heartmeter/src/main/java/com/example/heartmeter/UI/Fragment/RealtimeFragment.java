@@ -160,7 +160,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
                 break;
             case 2:
                 linePanel = (LinePanelFragment) mCurrentPanel;
-                linePanel.setAxisYScale(0, 1500);
+                linePanel.setAxisYScale(400, 600);
                 linePanel.setMaxPoints(500);
                 linePanel.setXStep(0.01f);
                 linePanel.setAxisXText("Time");
@@ -206,12 +206,6 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
             switch (currrent_mode_id) {
                 case 2:
-                    if (!(intent.getAction() == HubService.ACTION_DATA_RAW)) {
-                        return;
-                    }
-                    if (!(intent.getIntExtra(HubService.KEY_TYPE, 0) == HubService.TYPE_ECG)) {
-                        return;
-                    }
                     int[] ecg_data = intent.getIntArrayExtra(HubService.KEY_DATA);
                     float[] converted = ByteUtils.intArray2floatArray(ecg_data);
                     linePanel.appendValue(converted);

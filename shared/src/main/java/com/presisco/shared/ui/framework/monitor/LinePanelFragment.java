@@ -106,11 +106,11 @@ public class LinePanelFragment extends MonitorPanelFragment {
     public void appendValue(float[] values) {
         for (int i = 1; i < values.length; ++i) {
             mPoints.add(new PointValue(mLastXCoord + mXStep, values[i]));
+            mLastXCoord += mXStep;
             if (mPoints.size() > mMaxPoints) {
                 mPoints.remove(0);
             }
         }
-        mLastXCoord += mXStep;
         scrollViewport();
         initLineChart();
     }

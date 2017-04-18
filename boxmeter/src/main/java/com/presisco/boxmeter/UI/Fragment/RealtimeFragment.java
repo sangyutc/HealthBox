@@ -157,9 +157,9 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
         switch (currrent_mode_id) {
             case MODE_DEFAULT_SPO2H_MINUTE:
                 LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
-                linePanel.setAxisYScale(0, 100);
-                linePanel.setMaxPoints(6000);
-                linePanel.setXStep(0.01f);
+                linePanel.setAxisYScale(0, 110);
+                linePanel.setMaxPoints(60);
+                linePanel.setXStep(1f);
                 linePanel.setAxisXText("Time");
                 linePanel.setAxisYText("SPO2H");
                 LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
@@ -213,9 +213,8 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
             switch (currrent_mode_id) {
                 case MODE_DEFAULT_SPO2H_MINUTE:
-                    int[] ecg_data = intent.getIntArrayExtra(HubService.KEY_DATA);
-                    float[] converted = ByteUtils.intArray2floatArray(ecg_data);
-                    linePanel.appendValue(converted);
+                    int data = intent.getIntExtra(HubService.KEY_DATA, 25);
+                    linePanel.appendValue(data);
                     break;
             }
         }
@@ -227,8 +226,8 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
             switch (currrent_mode_id) {
                 case MODE_DEFAULT_PULSE_FIVE_SEC:
-                    int[] ecg_data = intent.getIntArrayExtra(HubService.KEY_DATA);
-                    float[] converted = ByteUtils.intArray2floatArray(ecg_data);
+                    int[] data = intent.getIntArrayExtra(HubService.KEY_DATA);
+                    float[] converted = ByteUtils.intArray2floatArray(data);
                     linePanel.appendValue(converted);
                     break;
             }
