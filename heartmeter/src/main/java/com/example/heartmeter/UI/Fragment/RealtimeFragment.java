@@ -20,7 +20,7 @@ import com.example.heartmeter.Service.HubService;
 import com.presisco.shared.ui.framework.monitor.LinePanelFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
-import com.presisco.shared.ui.framework.monitor.ValuePanelFragment;
+import com.presisco.shared.ui.framework.monitor.StringPanelFragment;
 import com.presisco.shared.utils.ByteUtils;
 
 import lecho.lib.hellocharts.util.ChartUtils;
@@ -38,7 +38,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     private MonitorHostFragment mMonitorHost;
     private BroadcastReceiver mCurrentReceiver;
 
-    private int currrent_mode_id = 0;
+    private int current_mode_id = 0;
     private MonitorPanelFragment mCurrentPanel;
 
     public RealtimeFragment() {
@@ -81,18 +81,18 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id) {
-                currrent_mode_id = pos;
+                current_mode_id = pos;
                 String action = "";
                 mLocalBroadcastManager.unregisterReceiver(mCurrentReceiver);
                 switch (pos) {
                     case 0:
                     case 3:
-                        action = HubService.ACTION_HEARTRATE_REDUCED;
+                        action = HubService.ACTION_HEART_RATE_REDUCED;
                         mCurrentReceiver = new HeartRateReceiver();
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_VALUE);
+                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_STRING);
                         break;
                     case 1:
-                        action = HubService.ACTION_HEARTRATE_VOLUME;
+                        action = HubService.ACTION_HEART_RATE_VOLUME;
                         mCurrentReceiver = new HeartVolumeReceiver();
                         mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
                         break;
@@ -142,9 +142,9 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     public void panelViewCreated(MonitorPanelFragment panel) {
         mCurrentPanel = panel;
         mCurrentPanel.clear();
-        mCurrentPanel.setTitle(modes[currrent_mode_id]);
-        mCurrentPanel.setHint(hints[currrent_mode_id]);
-        switch (currrent_mode_id) {
+        mCurrentPanel.setTitle(modes[current_mode_id]);
+        mCurrentPanel.setHint(hints[current_mode_id]);
+        switch (current_mode_id) {
             case 1:
                 LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
                 linePanel.setAxisYScale(0, 250);
@@ -177,10 +177,10 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     private class HeartRateReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            switch (currrent_mode_id) {
+            switch (current_mode_id) {
                 case 0:
                 case 3:
-                    ((ValuePanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    ((StringPanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
                     break;
             }
         }
@@ -190,7 +190,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
         @Override
         public void onReceive(Context context, Intent intent) {
             LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
-            switch (currrent_mode_id) {
+            switch (current_mode_id) {
                 case 1:
                     int[] heart_rate_data = intent.getIntArrayExtra(HubService.KEY_DATA);
                     float[] converted = ByteUtils.intArray2floatArray(heart_rate_data);
@@ -204,7 +204,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
         @Override
         public void onReceive(Context context, Intent intent) {
             LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
-            switch (currrent_mode_id) {
+            switch (current_mode_id) {
                 case 2:
                     int[] ecg_data = intent.getIntArrayExtra(HubService.KEY_DATA);
                     float[] converted = ByteUtils.intArray2floatArray(ecg_data);

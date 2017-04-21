@@ -28,13 +28,10 @@ import lecho.lib.hellocharts.view.LineChartView;
  * Use the {@link LinePanelFragment#} factory method to
  * create an instance of this fragment.
  */
-public class LinePanelFragment extends MonitorPanelFragment {
+public class LinePanelFragment extends ChartPanelFragment {
     private int mMaxPoints = 10;
 
     private LinkedList<PointValue> mPoints = new LinkedList<>();
-
-    private String mTitleText;
-    private String mHintText;
 
     private TextView mTitle;
     private TextView mHint;
@@ -51,11 +48,6 @@ public class LinePanelFragment extends MonitorPanelFragment {
     private LineStyle mLineStyle = new LineStyle();
 
     public LinePanelFragment() {
-    }
-
-    public static LinePanelFragment newInstance() {
-        LinePanelFragment linePanelFragment = new LinePanelFragment();
-        return linePanelFragment;
     }
 
     @Override
@@ -100,7 +92,7 @@ public class LinePanelFragment extends MonitorPanelFragment {
         }
         mLastXCoord += mXStep;
         scrollViewport();
-        initLineChart();
+        initChart();
     }
 
     public void appendValue(float[] values) {
@@ -112,7 +104,7 @@ public class LinePanelFragment extends MonitorPanelFragment {
             }
         }
         scrollViewport();
-        initLineChart();
+        initChart();
     }
 
     @Override
@@ -124,10 +116,11 @@ public class LinePanelFragment extends MonitorPanelFragment {
     public void clear() {
         mPoints.clear();
         resetViewport();
-        initLineChart();
+        initChart();
     }
 
-    private void initLineChart() {
+    @Override
+    protected void initChart() {
         mLineChart.setOnValueTouchListener(null);
 
         // Disable viewport recalculations, see toggleCubic() method for more info.
@@ -172,20 +165,14 @@ public class LinePanelFragment extends MonitorPanelFragment {
 
         mTitle = (TextView) rootView.findViewById(R.id.textTitle);
         mHint = (TextView) rootView.findViewById(R.id.textHint);
-        if (mTitleText != null) {
-            mTitle.setText(mTitleText);
-        }
-        if (mHintText != null) {
-            mHint.setText(mHintText);
-        }
 
         mLineChart = (LineChartView) rootView.findViewById(R.id.lineChart);
 
         mViewCreated.panelViewCreated(this);
 
-        initLineChart();
+        //initChart();
 
-        resetViewport();
+        //resetViewport();
 
         return rootView;
     }

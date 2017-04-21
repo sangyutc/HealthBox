@@ -18,8 +18,10 @@ import java.util.Map;
  * create an instance of this fragment.
  */
 public class MonitorHostFragment extends Fragment {
-    public static final String PANEL_VALUE = "VALUE";
+    public static final String PANEL_STRING = "STRING";
     public static final String PANEL_LINE = "LINE";
+    public static final String PANEL_SCROLL_LINE = "SCROLL_LINE";
+    public static final String PANEL_PIE = "PIE";
 
     private HashMap<String, MonitorPanelFragment> mPanels;
     private MonitorPanelFragment mCurrentPanel;
@@ -32,8 +34,10 @@ public class MonitorHostFragment extends Fragment {
 
     private void preparePanels() {
         mPanels = new HashMap<>();
-        mPanels.put(PANEL_VALUE, ValuePanelFragment.newInstance());
-        mPanels.put(PANEL_LINE, LinePanelFragment.newInstance());
+        mPanels.put(PANEL_STRING, new StringPanelFragment());
+        mPanels.put(PANEL_LINE, new LinePanelFragment());
+        mPanels.put(PANEL_SCROLL_LINE, new ScrollLinePanelFragment());
+        mPanels.put(PANEL_PIE, new PiePanelFragment());
 
         for (Map.Entry<String, MonitorPanelFragment> set : mPanels.entrySet()) {
             set.getValue().setViewCreatedListener(mPanelViewCreatedListener);

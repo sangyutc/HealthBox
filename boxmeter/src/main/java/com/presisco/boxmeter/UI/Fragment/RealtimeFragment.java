@@ -20,7 +20,7 @@ import com.presisco.boxmeter.Service.HubService;
 import com.presisco.shared.ui.framework.monitor.LinePanelFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
-import com.presisco.shared.ui.framework.monitor.ValuePanelFragment;
+import com.presisco.shared.ui.framework.monitor.StringPanelFragment;
 import com.presisco.shared.utils.ByteUtils;
 import com.presisco.shared.utils.LCAT;
 
@@ -99,12 +99,12 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
                     case MODE_AEROBIC:
                         action = HubService.ACTION_SPO2H;
                         mCurrentReceiver = new SPO2HReceiver();
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_VALUE);
+                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_STRING);
                         break;
                     case MODE_DEFAULT_PULSE:
                         action = HubService.ACTION_PULSE;
                         mCurrentReceiver = new PulseReceiver();
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_VALUE);
+                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_STRING);
                         break;
                     case MODE_DEFAULT_SPO2H_MINUTE:
                         action = HubService.ACTION_SPO2H_VOLUME;
@@ -190,7 +190,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             switch (currrent_mode_id) {
                 case MODE_DEFAULT_SPO2H:
                 case MODE_AEROBIC:
-                    ((ValuePanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    ((StringPanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
                     break;
             }
         }
@@ -201,7 +201,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
         public void onReceive(Context context, Intent intent) {
             switch (currrent_mode_id) {
                 case MODE_DEFAULT_PULSE:
-                    ((ValuePanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    ((StringPanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
                     break;
             }
         }

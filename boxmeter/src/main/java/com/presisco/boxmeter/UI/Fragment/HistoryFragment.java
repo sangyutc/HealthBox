@@ -25,7 +25,7 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
     private Spinner mModeSpinner;
     private MonitorHostFragment mMonitorHost;
 
-    private int currrent_mode_id = 0;
+    private int current_mode_id = 0;
     private MonitorPanelFragment mCurrentPanel;
 
     public HistoryFragment() {
@@ -65,7 +65,7 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id) {
-                currrent_mode_id = pos;
+                current_mode_id = pos;
                 switch (pos) {
                     case 0:
                         mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
@@ -88,9 +88,9 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
     @Override
     public void panelViewCreated(MonitorPanelFragment panel) {
         mCurrentPanel = panel;
-        mCurrentPanel.setTitle(modes[currrent_mode_id]);
-        mCurrentPanel.setHint(hints[currrent_mode_id]);
-        switch (currrent_mode_id) {
+        mCurrentPanel.setTitle(modes[current_mode_id]);
+        mCurrentPanel.setHint(hints[current_mode_id]);
+        switch (current_mode_id) {
             case 0:
                 break;
             case 1:

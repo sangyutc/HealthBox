@@ -29,16 +29,17 @@ public class SensorData {
         sensorData.seq = packet[0] & 0x0F;
 
         //第二个字节
-        sensorData.status = (packet[1] & 0xF0) >>> 4;
+        sensorData.status = ByteUtils.getHigherByte(packet[1]);
+
         sensorData.link_mode = ByteUtils.getBit(packet[1], 3);
         sensorData.ra_detach = ByteUtils.getBit(packet[1], 2);
         sensorData.la_detach = ByteUtils.getBit(packet[1], 1);
-
-        //第三，第四个字节
         sensorData.heart_rate = (packet[1] & 0x01) << 8;
+
+        //第三个字节
         sensorData.heart_rate += (int) packet[2] & 0xFF;
 
-        //第五个字节
+        //第四-五个字节
         sensorData.ecg = ((packet[3] & 0xFF) << 8) + (packet[4] & 0xFF);
         if (sensorData.ecg > 0xFFFF) {
             Log.d("parseDataPacket()", "ECG Overflow");
