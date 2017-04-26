@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.presisco.boxmeter.R;
 import com.presisco.boxmeter.Service.BTService;
 import com.presisco.boxmeter.UI.Activity.BTBoxActivity;
+import com.presisco.boxmeter.UI.Activity.SurveyActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,6 +19,7 @@ import com.presisco.boxmeter.UI.Activity.BTBoxActivity;
  * create an instance of this fragment.
  */
 public class PersonalFragment extends Fragment {
+    private static final int REQUEST_ID_SIGN_UP = 1;
 
     public PersonalFragment() {
         // Required empty public constructor
@@ -43,6 +45,12 @@ public class PersonalFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(BTService.ACTION_TARGET_CONNECT));
+            }
+        });
+        rootView.findViewById(R.id.buttonSignUp).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(getActivity(), SurveyActivity.class), REQUEST_ID_SIGN_UP);
             }
         });
         return rootView;

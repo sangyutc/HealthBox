@@ -85,6 +85,28 @@ public class LinePanelFragment extends ChartPanelFragment {
         mXStep = step;
     }
 
+    public void appendPoints(PointValue[] points) {
+        for (PointValue point : points) {
+            mPoints.add(point);
+            mLastXCoord += mXStep;
+            if (mPoints.size() > mMaxPoints) {
+                mPoints.remove(0);
+            }
+        }
+        scrollViewport();
+        initChart();
+    }
+
+    public void appendPoint(PointValue point) {
+        mPoints.add(point);
+        if (mPoints.size() > mMaxPoints) {
+            mPoints.remove(0);
+        }
+        mLastXCoord += mXStep;
+        scrollViewport();
+        initChart();
+    }
+
     public void appendValue(float value) {
         mPoints.add(new PointValue(mLastXCoord + mXStep, value));
         if (mPoints.size() > mMaxPoints) {
@@ -109,7 +131,7 @@ public class LinePanelFragment extends ChartPanelFragment {
 
     @Override
     public void redraw() {
-
+        initChart();
     }
 
     @Override

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_age">请问您的年龄是</string>
+    <string-array name="age">
+        <item>小于18周岁</item>
+        <item>18周岁到65周岁</item>
+        <item>大于65周岁</item>
+    </string-array>
+    <string name="label_gender">请问您的性别是</string>
+    <string-array name="gender">
+        <item>男</item>
+        <item>女</item>
+    </string-array>
+    <string name="label_political_status">请问您的政治面貌是</string>
+    <string-array name="political_status">
+        <item>中共党员</item>
+        <item>共青团员</item>
+        <item>民主党派</item>
+        <item>群众</item>
+        <item>其他</item>
+    </string-array>
+    <string name="label_education_status">请问您的教育程度是（包括目前在读的）</string>
+    <string-array name="education_status">
+        <item>未接受教育</item>
+        <item>私塾</item>
+        <item>小学</item>
+        <item>初中</item>
+        <item>普通高中</item>
+        <item>职业高中/中专/技校</item>
+        <item>大学专科</item>
+        <item>大学本科</item>
+        <item>研究生及以上</item>
+        <item>其他</item>
+    </string-array>
+    <string name="label_career_status">您目前的工作状态是</string>
+    <string-array name="career_status">
+        <item>只从事非农工作</item>
+        <item>非农为主，附带务农</item>
+        <item>务农为主，附带非农</item>
+        <item>只从事务农工作</item>
+        <item>暂无工作</item>
+    </string-array>
+    <string name="label_annual_income">您的个人年收入目前是</string>
+    <string name="label_income_unit">万元</string>
+    <string name="label_social_status">您认为您本人的社会经济地位在本地答题属于那个层次</string>
+    <string-array name="social_status">
+        <item>上</item>
+        <item>中上</item>
+        <item>中</item>
+        <item>中下</item>
+        <item>下</item>
+        <item>不好说</item>
+    </string-array>
+    <string name="label_usage_frequency">您使用血氧检测软件的频率是</string>
+    <string-array name="usage_frequency">
+        <item>从不</item>
+        <item>偶尔</item>
+        <item>经常</item>
+        <item>总是</item>
+    </string-array>
+    <string name="label_trust">您对于血样检测软件的信任度是</string>
+    <string-array name="trust">
+        <item>非常信任</item>
+        <item>比较信任</item>
+        <item>信任</item>
+        <item>不太信任</item>
+        <item>不信任</item>
+    </string-array>
+    <string name="label_channel">您是通过何种途径了解到此软件的</string>
+    <string-array name="channel">
+        <item>医生推荐</item>
+        <item>亲友推荐</item>
+        <item>媒体宣传</item>
+        <item>官方平台</item>
+    </string-array>
+</resources>

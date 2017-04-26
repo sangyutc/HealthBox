@@ -38,6 +38,9 @@ public class PiePanelFragment extends ChartPanelFragment {
 
         mPieChartView = (PieChartView) rootView.findViewById(R.id.pieChart);
 
+        mTitle = (TextView) rootView.findViewById(R.id.textTitle);
+        mHint = (TextView) rootView.findViewById(R.id.textHint);
+
         mViewCreated.panelViewCreated(this);
 
         return rootView;
@@ -53,12 +56,19 @@ public class PiePanelFragment extends ChartPanelFragment {
         mHint.setText(hint);
     }
 
+    public void appendSlices(SliceValue[] slices) {
+        for (SliceValue slice : slices) {
+            mSlices.add(slice);
+        }
+        redraw();
+    }
+
     @Override
     public void appendValue(float[] values) {
         for (float value : values) {
             mSlices.add(new SliceValue(value));
         }
-        initChart();
+        redraw();
     }
 
     @Override
@@ -84,12 +94,13 @@ public class PiePanelFragment extends ChartPanelFragment {
 
     @Override
     public void redraw() {
-
+        initChart();
     }
 
     @Override
     public void clear() {
-
+        mSlices.clear();
+        redraw();
     }
 
     public static class PieStyle {

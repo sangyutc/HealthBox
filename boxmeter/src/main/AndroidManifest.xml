@@ -27,13 +27,11 @@
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Service.DBService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
             android:name=".Service.HubService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".UI.Activity.SurveyActivity"></activity>
     </application>
 
 </manifest>

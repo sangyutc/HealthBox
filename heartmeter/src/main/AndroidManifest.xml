@@ -25,15 +25,13 @@
             android:name=".Service.BTService"
             android:enabled="true"
             android:exported="true" />
-
         <service
             android:name=".Service.HubService"
             android:enabled="true"
             android:exported="true" />
 
         <activity android:name=".UI.Activity.BTBoxActivity" />
-
-
+        <activity android:name=".UI.Activity.SurveyActivity"></activity>
     </application>
 
 </manifest>

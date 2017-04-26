@@ -1,0 +1,139 @@
+package com.presisco.boxmeter.UI.Activity;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import com.presisco.boxmeter.R;
+
+/**
+ * 用户注册及调查窗口
+ */
+public class SurveyActivity extends AppCompatActivity {
+    //所有的执行结果定义
+    public static final int RESULT_CANCELED = 0;
+    public static final int RESULT_PASSED = 1;
+
+    //界面所有输入控件的引用
+    private EditText mNameEdit;
+    private EditText mPasswordEdit;
+    private EditText mRepeatEdit;
+    private Spinner mAgeSpinner;
+    private Spinner mGenderSpinner;
+    private Spinner mPoliticalStatusSpinner;
+    private Spinner mEducationStatusSpinner;
+    private Spinner mCareerStatusSpinner;
+    private EditText mAnnualIncomeEdit;
+    private Spinner mSocialStatusSpinner;
+    private Spinner mUsageFrequencySpinner;
+    private Spinner mTrustSpinnerSpinner;
+    private Spinner mChannelSpinner;
+
+    /**
+     * 获取文字编辑控件的引用
+     *
+     * @param id 控件的id
+     * @return 返回控件的引用
+     */
+    private EditText findEdit(int id) {
+        return (EditText) findViewById(id);
+    }
+
+    /**
+     * 获取下拉列表控件的引用
+     *
+     * @param id 控件的id
+     * @return 返回控件的引用
+     */
+    private Spinner findSpinner(int id) {
+        return (Spinner) findViewById(id);
+    }
+
+    /**
+     * 将控件与变量对应起来
+     */
+    private void linkViews() {
+        mNameEdit = findEdit(R.id.editName);
+        mPasswordEdit = findEdit(R.id.editPassword);
+        mRepeatEdit = findEdit(R.id.editRepeatPassword);
+        mAgeSpinner = findSpinner(R.id.spinnerAge);
+        mGenderSpinner = findSpinner(R.id.spinnerGender);
+        mPoliticalStatusSpinner = findSpinner(R.id.spinnerPoliticalStatus);
+        mEducationStatusSpinner = findSpinner(R.id.spinnerEducationStatus);
+        mCareerStatusSpinner = findSpinner(R.id.spinnerCareerStatus);
+        mAnnualIncomeEdit = findEdit(R.id.editAnnualIncome);
+        mSocialStatusSpinner = findSpinner(R.id.spinnerSocialStatus);
+        mUsageFrequencySpinner = findSpinner(R.id.spinnerUsageFrequency);
+        mTrustSpinnerSpinner = findSpinner(R.id.spinnerTrust);
+        mChannelSpinner = findSpinner(R.id.spinnerChannel);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_survey);
+        linkViews();
+        setResult(RESULT_CANCELED);
+    }
+
+    /**
+     * "取消"按钮的响应函数
+     *
+     * @param v "取消"按钮的引用
+     */
+    public void onCancel(View v) {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    /**
+     * 获取文本编辑控件的字符串值
+     *
+     * @param edit 文本编辑控件的引用
+     * @return 返回字符串值
+     */
+    private String getValue(EditText edit) {
+        return edit.getText().toString().trim();
+    }
+
+    /**
+     * 将下拉列表的当前选择项位置转换为调查所需的值
+     *
+     * @param spinner 下拉列表的引用
+     * @return 返回字符串值
+     */
+    private String getValue(Spinner spinner) {
+        return (spinner.getSelectedItemPosition() + 1) + "";
+    }
+
+    /**
+     * "提交"按钮的响应函数
+     *
+     * @param v "提交"按钮的引用
+     */
+    public void onApply(View v) {
+        if (!getValue(mPasswordEdit).equals(getValue(mRepeatEdit))) {
+            Toast.makeText(this, R.string.text_wrong_password, Toast.LENGTH_SHORT);
+            return;
+        }
+
+        String[] data = new String[]{
+                getValue(mNameEdit),
+                getValue(mPasswordEdit),
+                getValue(mAgeSpinner),
+                getValue(mGenderSpinner),
+                getValue(mPoliticalStatusSpinner),
+                getValue(mEducationStatusSpinner),
+                getValue(mCareerStatusSpinner),
+                getValue(mAnnualIncomeEdit),
+                getValue(mSocialStatusSpinner),
+                getValue(mUsageFrequencySpinner),
+                getValue(mTrustSpinnerSpinner),
+                getValue(mChannelSpinner)
+        };
+
+    }
+}
