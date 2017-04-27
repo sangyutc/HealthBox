@@ -35,27 +35,34 @@
     </string-array>
 
     <string-array name="realtime_modes">
-        <item>心率显示</item>
-        <item>心率曲线 1分钟</item>
-        <item>心电曲线 5秒</item>
+        <item>常规-心率显示</item>
+        <item>常规-心率曲线 1分钟</item>
+        <item>常规-心电曲线 5秒</item>
         <item>有氧运动</item>
+        <item>无氧运动</item>
+        <item>睡眠</item>
     </string-array>
 
     <string-array name="realtime_mode_hints">
-        <item>默认，显示心率数据</item>
-        <item>默认，显示2秒内心率曲线</item>
-        <item>默认，显示2秒内心电曲线</item>
+        <item>常规，显示心率数据</item>
+        <item>常规，显示2秒内心率曲线</item>
+        <item>常规，显示2秒内心电曲线</item>
         <item>慢跑，游泳等</item>
+        <item>冲刺，球类运动等</item>
+        <item>睡眠参数检测</item>
     </string-array>
 
     <string-array name="history_modes">
-        <item>总览</item>
+        <item>常规</item>
         <item>有氧运动</item>
-        <item></item>
+        <item>无氧运动</item>
+        <item>睡眠</item>
     </string-array>
 
     <string-array name="history_mode_hints">
         <item>全部运动</item>
         <item>所有有氧运动记录</item>
+        <item>所有无氧运动记录</item>
+        <item>睡眠状态记录</item>
     </string-array>
 </resources>

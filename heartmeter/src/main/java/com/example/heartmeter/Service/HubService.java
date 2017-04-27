@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.example.heartmeter.Data.Event;
+import com.example.heartmeter.Data.EventData;
 import com.example.heartmeter.Data.SensorData;
 import com.example.heartmeter.R;
 import com.example.heartmeter.storage.SQLiteManager;
@@ -20,6 +21,7 @@ import com.presisco.shared.utils.ByteUtils;
 import com.presisco.shared.utils.LCAT;
 import com.presisco.shared.utils.ValueUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.concurrent.Executors;
 
 public class HubService extends BaseHubService implements BaseBluetoothService.PacketReceivedListener {
@@ -55,12 +57,13 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     private static final int HEAD_RESPONSE = 0xC0;
 
     private static final int ROOF_HEARTRATE = 250;
-    private static final int ROOF_ECG = 600;
+    private static final int ROOF_ECG = 1500;
     private static final int FLOOR_HEARTRATE = 0;
-    private static final int FLOOR_ECG = 400;
+    private static final int FLOOR_ECG = 0;
 
     private static final int ID_PROBE_DETACH = 0;
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd-HH:mm");
     int mInstructionIdCounter = 1;
     int mSampleRate = 100;
     BTServiceConnection mConnection = new BTServiceConnection();
@@ -69,7 +72,7 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     private int mAnalyseRate = 1;
     private int mAnalyseGroupSize = 100 / mAnalyseRate;
     private SensorData[] raw_data;
-    private int[] raw_heartrate;
+    private int[] raw_heart_rate;
     private int[] raw_ecg;
     private int data_packet_counter = 0;
     private long current_event_id = -1;
@@ -97,7 +100,10 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     public void onCreate() {
         super.onCreate();
         //registerLocalReceiver(new BTServiceReceiver(), new IntentFilter(BaseBluetoothService.ACTION_TARGET_DATA_RECEIVED));
-        registerLocalReceiver(new HubHostReceiver(), new IntentFilter(ACTION_SEND_INSTRUCTION));
+        HubHostReceiver receiver = new HubHostReceiver();
+        registerLocalReceiver(receiver, new IntentFilter(ACTION_SEND_INSTRUCTION));
+        registerLocalReceiver(receiver, new IntentFilter(ACTION_START_EVENT));
+        registerLocalReceiver(receiver, new IntentFilter(ACTION_STOP_EVENT));
         bindService(new Intent(this, BTService.class), mConnection, Context.BIND_AUTO_CREATE);
         mDataManager = new SQLiteManager(this);
     }
@@ -162,34 +168,45 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
     @Override
     protected void analyseGroup() {
         int error = 0;
-        int heartrate_sum = 0;
+        int heart_rate_sum = 0;
+        int valid_heart_rate_count = 0;
         for (int i = 0; i < mAnalyseGroupSize; ++i) {
             if (raw_data[i].la_detach
                     || raw_data[i].ra_detach
                     || raw_data[i].status != SensorData.STATUS_NORMAL) {
                 error++;
+            } else {
+                if (ValueUtils.inLimit(raw_data[i].heart_rate, ROOF_HEARTRATE, FLOOR_HEARTRATE)) {
+                    heart_rate_sum += raw_data[i].heart_rate;
+                    valid_heart_rate_count++;
+                }
+                raw_ecg[i] = ValueUtils.limit(raw_ecg[i], ROOF_ECG, FLOOR_ECG);
             }
-
-            heartrate_sum += ValueUtils.limit(raw_data[i].heart_rate, ROOF_HEARTRATE, FLOOR_HEARTRATE);
-            raw_ecg[i] = ValueUtils.limit(raw_ecg[i], ROOF_ECG, FLOOR_ECG);
         }
 
         if (error < mAnalyseGroupSize / 5) {
+            if (valid_heart_rate_count == 0) {
+                valid_heart_rate_count = 1;
+            }
             broadcast(ACTION_ECG, raw_ecg);
-            broadcast(ACTION_HEART_RATE_REDUCED, heartrate_sum / mAnalyseGroupSize);
-            mDataManager.addDataToEvent(current_event_id, heartrate_sum / mAnalyseGroupSize, analyse_group_counter);
+            broadcast(ACTION_HEART_RATE_REDUCED, heart_rate_sum / valid_heart_rate_count);
+            EventData data = new EventData();
+            data.event_id = current_event_id;
+            data.heart_rate = heart_rate_sum / valid_heart_rate_count;
+            data.offset_time = analyse_group_counter;
+            mDataManager.addDataToEvent(data);
             analyse_group_counter++;
         } else {
-            sendNotification(ID_PROBE_DETACH, R.drawable.ic_launcher, "Probe Detached", "Make sure probe connected");
+            sendNotification(ID_PROBE_DETACH, R.drawable.ic_launcher, "探头脱落", "确保探头连接到手臂上");
             broadcast(ACTION_PROBE_DETACH);
             stopListening();
         }
     }
 
     @Override
-    public void onReceived(byte[] packet) {
+    public void onPacketReceived(byte[] packet) {
         if (ByteUtils.byteHighMatch(packet[0], HEAD_RESPONSE)) {
-            LCAT.d(this, "received response packet: " + ByteUtils.bytes2hex(packet));
+            LCAT.d(this, "receivedByte response packet: " + ByteUtils.bytes2hex(packet));
         } else {
             if (data_packet_counter >= mSampleRate) {
                 analyseGroup();
@@ -198,7 +215,7 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
             SensorData data = SensorData.parseDataPacket(packet);
 
             raw_data[data_packet_counter] = data;
-            raw_heartrate[data_packet_counter] = data.heart_rate;
+            raw_heart_rate[data_packet_counter] = data.heart_rate;
             raw_ecg[data_packet_counter] = data.ecg;
             data_packet_counter++;
         }
@@ -220,20 +237,17 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
             LCAT.d(this, "broadcast received: " + intent.getAction());
             switch (intent.getAction()) {
                 case ACTION_SEND_INSTRUCTION:
-                    if (intent.getByteExtra(KEY_INSTRUCTION, UNKNOWN) == SEND_START) {
-                        new StartMeasureTask().executeOnExecutor(Executors.newSingleThreadExecutor());
-                    } else {
-                        sendInstruction(intent);
-                    }
+                    sendInstruction(intent);
+                    break;
+                case ACTION_STOP_EVENT:
+                    sendInstruction(new Intent().putExtra(KEY_INSTRUCTION, SEND_STOP));
+                    stopListening();
                     break;
                 case ACTION_START_EVENT:
-                    mAnalyseRate = intent.getIntExtra(KEY_ANALYSE_RATE, 1);
                     mAnalyseGroupSize = mSampleRate / mAnalyseRate;
-                    Event event = new Event();
-                    event.type = intent.getStringExtra(KEY_TYPE);
-                    event.analyse_rate = mAnalyseRate;
-                    event.start_time = intent.getStringExtra(KEY_START_TIME);
+                    Event event = new Event(intent.getStringExtra(KEY_EVENT_TYPE));
                     current_event_id = mDataManager.addEvent(event);
+                    new StartMeasureTask().executeOnExecutor(Executors.newSingleThreadExecutor());
                     startListening();
                     break;
             }
@@ -257,7 +271,7 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
                 data_packet_counter = 0;
                 raw_data = new SensorData[mSampleRate];
                 raw_ecg = new int[mSampleRate];
-                raw_heartrate = new int[mSampleRate];
+                raw_heart_rate = new int[mSampleRate];
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

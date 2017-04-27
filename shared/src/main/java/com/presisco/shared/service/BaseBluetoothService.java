@@ -112,7 +112,12 @@ public abstract class BaseBluetoothService extends Service {
     }
 
     public interface PacketReceivedListener {
-        void onReceived(byte[] packet);
+        /**
+         * 当收到完整的数据包后调用
+         *
+         * @param packet 数据包
+         */
+        void onPacketReceived(byte[] packet);
     }
 
     private class BTSendReceiver extends BroadcastReceiver {

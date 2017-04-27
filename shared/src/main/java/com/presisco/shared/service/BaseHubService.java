@@ -18,6 +18,9 @@ public abstract class BaseHubService extends Service {
     public static final String ACTION_DATA_FILTERED = "com.presisco.shared.service.DATA_FILTERED";
     public static final String ACTION_DATA_REDUCED = "com.presisco.shared.service.DATA_REDUCED";
 
+    public static final String ACTION_START_EVENT = "com.presisco.shared.service.START_EVENT";
+    public static final String ACTION_STOP_EVENT = "com.presisco.shared.service.STOP";
+    public static final String KEY_EVENT_TYPE = "EVENT_TYPE";
     public static final String KEY_TYPE = "TYPE";
     public static final String KEY_DATA = "DATA";
 

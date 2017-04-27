@@ -1,5 +1,6 @@
 package com.presisco.boxmeter.UI.Fragment;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,7 +11,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.presisco.boxmeter.Data.EventData;
 import com.presisco.boxmeter.R;
+import com.presisco.boxmeter.UI.history.TypedHistoryMode;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
 
@@ -20,13 +23,18 @@ import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
  * create an instance of this fragment.
  */
 public class HistoryFragment extends Fragment implements MonitorPanelFragment.ViewCreatedListener {
-    private String[] modes;
-    private String[] hints;
+    private static final int MODE_DEFAULT = 0;
+    private static final int MODE_AEROBIC = 1;
+    private static final int MODE_ANAEROBIC = 2;
+    private static final int MODE_SLEEP = 3;
     private Spinner mModeSpinner;
+    private Spinner mEventSpinner;
     private MonitorHostFragment mMonitorHost;
 
-    private int current_mode_id = 0;
-    private MonitorPanelFragment mCurrentPanel;
+    private TypedHistoryMode[] mAnalyseModes = null;
+    private TypedHistoryMode mCurrentMode = null;
+
+    private MonitorPanelFragment mCurrentPanel = null;
 
     public HistoryFragment() {
     }
@@ -42,13 +50,132 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
         return fragment;
     }
 
+    private void initModes() {
+        final String[] modes_title = getResources().getStringArray(R.array.realtime_modes);
+        final String[] modes_hint = getResources().getStringArray(R.array.realtime_mode_hints);
+        mAnalyseModes = new TypedHistoryMode[]{
+                new TypedHistoryMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_DEFAULT];
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_SCROLL_LINE;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_DEFAULT]);
+                    }
+
+                    @Override
+                    public void analyseData(EventData[] data, int analyse_rate) {
+
+                    }
+
+                    @Override
+                    public void displayData() {
+
+                    }
+                },
+                new TypedHistoryMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_AEROBIC];
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_PIE;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_AEROBIC]);
+                    }
+
+                    @Override
+                    public void analyseData(EventData[] data, int analyse_rate) {
+
+                    }
+
+                    @Override
+                    public void displayData() {
+
+                    }
+                },
+                new TypedHistoryMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_ANAEROBIC];
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_PIE;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_ANAEROBIC]);
+                    }
+
+                    @Override
+                    public void analyseData(EventData[] data, int analyse_rate) {
+
+                    }
+
+                    @Override
+                    public void displayData() {
+
+                    }
+                },
+                new TypedHistoryMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_SLEEP];
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_PIE;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_SLEEP]);
+                    }
+
+                    @Override
+                    public void analyseData(EventData[] data, int analyse_rate) {
+
+                    }
+
+                    @Override
+                    public void displayData() {
+
+                    }
+                },
+
+        };
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        modes = getResources().getStringArray(R.array.history_modes);
-        hints = getResources().getStringArray(R.array.history_mode_hints);
+        initModes();
     }
+
+    private String[] getTitles() {
+        String[] titles = new String[mAnalyseModes.length];
+        for (int i = 0; i < mAnalyseModes.length; ++i) {
+            titles[i] = mAnalyseModes[i].getModeTitle();
+        }
+        return titles;
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,15 +192,8 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id) {
-                current_mode_id = pos;
-                switch (pos) {
-                    case 0:
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
-                        break;
-                    case 1:
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
-                        break;
-                }
+                mCurrentMode = mAnalyseModes[pos];
+                mMonitorHost.displayPanel(mCurrentMode.getPanelType());
             }
 
             @Override
@@ -81,20 +201,31 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
 
             }
         });
-        mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, modes));
+        mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getTitles()));
         return rootView;
     }
 
     @Override
     public void panelViewCreated(MonitorPanelFragment panel) {
         mCurrentPanel = panel;
-        mCurrentPanel.setTitle(modes[current_mode_id]);
-        mCurrentPanel.setHint(hints[current_mode_id]);
-        switch (current_mode_id) {
-            case 0:
-                break;
-            case 1:
-                break;
+        mCurrentPanel.clear();
+        mCurrentMode.initPanelView();
+    }
+
+    private class AnalyseTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            return null;
         }
     }
 }

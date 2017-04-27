@@ -33,11 +33,13 @@
     </string-array>
 
     <string-array name="realtime_modes">
-        <item>实时血氧</item>
-        <item>实时脉率</item>
-        <item>血氧曲线 1分钟</item>
-        <item>脉率曲线 1分钟</item>
+        <item>常规-实时血氧</item>
+        <item>常规-实时脉率</item>
+        <item>常规-血氧曲线 1分钟</item>
+        <item>常规-脉率曲线 1分钟</item>
         <item>有氧运动</item>
+        <item>无氧运动</item>
+        <item>睡眠</item>
     </string-array>
 
     <string-array name="realtime_mode_hints">
@@ -46,15 +48,21 @@
         <item>显示一段时间内的血氧状况</item>
         <item>显示一段时间内的脉率状况</item>
         <item>慢跑，游泳等</item>
+        <item>冲刺，球类运动等</item>
+        <item>睡眠参数检测</item>
     </string-array>
 
     <string-array name="history_modes">
         <item>总览</item>
         <item>有氧运动</item>
+        <item>无氧运动</item>
+        <item>睡眠</item>
     </string-array>
 
     <string-array name="history_mode_hints">
         <item>全部运动</item>
         <item>所有有氧运动记录</item>
+        <item>所有无氧运动记录</item>
+        <item>睡眠状态记录</item>
     </string-array>
 </resources>

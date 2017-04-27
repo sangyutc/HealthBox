@@ -141,7 +141,7 @@ public class BTService extends BaseBluetoothService
      * @param data 接收到的蓝牙数据
      */
     @Override
-    public void received(byte data) {
+    public void receivedByte(byte data) {
         if (mBTByteCursor == INDEX_PACKET_HEAD) {
             mBTBuffer[INDEX_PACKET_HEAD] = data;
             mPacketType = data & 0xF0;
@@ -163,7 +163,7 @@ public class BTService extends BaseBluetoothService
                     }
                     //LCAT.d(this,"receiverd packet: "+ByteUtils.bytes2hex(packet));
                     //broadcastData(packet);
-                    getPacketReceivedListener().onReceived(packet);
+                    getPacketReceivedListener().onPacketReceived(packet);
                 }
                 mBTByteCursor = INDEX_PACKET_HEAD - 1;
                 mBTPacketSize = MIN_PACKET_SIZE;

@@ -6,15 +6,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import com.presisco.boxmeter.Data.Event;
+import com.presisco.boxmeter.Data.EventData;
+import com.presisco.shared.storage.HealthDataManager;
 import com.presisco.shared.storage.sqlite.Column;
-import com.presisco.shared.storage.sqlite.SQLiteOpener;
 import com.presisco.shared.storage.sqlite.Table;
 
 /**
  * Created by presisco on 2017/4/17.
  */
 
-public class SQLiteManager {
+public class SQLiteManager extends HealthDataManager<Event, EventData> {
     public static final String TABLE_SPO2H = "HEART_RATE";
     public static final String TABLE_EVENT = "EVENT";
     public static final String COLUMN_ANALYSE_RATE = "analyse_rate";
@@ -45,21 +46,22 @@ public class SQLiteManager {
     private static final String DATABASE_NAME = "app_data";
 
     private static final String STATEMENT_INSERT_EVENT = "insert into " + TABLE_EVENT
-            + "( " + COLUMN_EVENT_TYPE + COLUMN_ANALYSE_RATE + COLUMN_START_TIME
+            + "( " + COLUMN_EVENT_TYPE + "," + COLUMN_ANALYSE_RATE + "," + COLUMN_START_TIME
             + " ) values(?,?,?)";
     private static final String STATEMENT_INSERT_DATA = "insert into " + TABLE_SPO2H
-            + "( " + COLUMN_EVENT_ID + COLUMN_SPO2H + COLUMN_OFFSET_TIME
+            + "( " + COLUMN_EVENT_ID + "," + COLUMN_SPO2H + "," + COLUMN_OFFSET_TIME
             + ") values(?,?,?)";
-
-    private SQLiteOpener mDBOpener = null;
+    private static final String STATEMENT_DELETE_EVENT = "delete from " + TABLE_EVENT
+            + " where " + COLUMN_EVENT_ID + " = ?";
+    private static final String STATEMENT_DELETE_DATA = "delete from " + TABLE_SPO2H
+            + " where " + COLUMN_EVENT_ID + " = ?";
 
     public SQLiteManager(Context context) {
-        mDBOpener = new SQLiteOpener(context, DATABASE_NAME, 1, TABLES);
+        super(context, DATABASE_NAME, TABLES);
     }
 
-    public Event[] getAllEvents() {
-        Cursor cursor = mDBOpener.getReadableDatabase().query(
-                TABLE_EVENT, COLUMNS_EVENT, null, null, null, null, null);
+    @Override
+    protected Event[] getEvents(Cursor cursor) {
         Event[] events = new Event[cursor.getCount()];
         int index = 0;
         while (cursor.moveToNext()) {
@@ -73,21 +75,40 @@ public class SQLiteManager {
         return events;
     }
 
-    public int[] getAllDataInEvent(long event_id) {
-        Cursor cursor = mDBOpener.getReadableDatabase().query(
+    @Override
+    public Event[] getAllEvents() {
+        Cursor cursor = getDatabase(READ_DATABASE).query(
+                TABLE_EVENT, COLUMNS_EVENT, null, null, null, null, null);
+        return getEvents(cursor);
+    }
+
+    @Override
+    public Event[] getEventsByType(String type) {
+        Cursor cursor = getDatabase(READ_DATABASE).query(
+                TABLE_EVENT, COLUMNS_EVENT, COLUMN_EVENT_TYPE + " = ?", new String[]{type}, null, null, null);
+        return getEvents(cursor);
+    }
+
+    @Override
+    public EventData[] getAllDataInEvent(long event_id) {
+        Cursor cursor = getDatabase(READ_DATABASE).query(
                 TABLE_SPO2H, new String[]{COLUMN_SPO2H, COLUMN_OFFSET_TIME},
                 COLUMN_EVENT_ID + "=?", new String[]{event_id + ""},
                 null, null, COLUMN_OFFSET_TIME);
-        int[] data = new int[cursor.getCount()];
+        EventData[] data = new EventData[cursor.getCount()];
         int index = 0;
         while (cursor.moveToNext()) {
-            data[index++] = (int) cursor.getLong(cursor.getColumnIndex(COLUMN_SPO2H));
+            data[index].event_id = event_id;
+            data[index].spo2h = (int) cursor.getLong(cursor.getColumnIndex(COLUMN_SPO2H));
+            data[index].offset_time = (int) cursor.getLong(cursor.getColumnIndex(COLUMN_OFFSET_TIME));
+            index++;
         }
         return data;
     }
 
+    @Override
     public long addEvent(Event event) {
-        SQLiteStatement statement = mDBOpener.getWritableDatabase().compileStatement(STATEMENT_INSERT_EVENT);
+        SQLiteStatement statement = getDatabase(WRITE_DATABASE).compileStatement(STATEMENT_INSERT_EVENT);
         statement.bindString(1, event.type);
         statement.bindLong(2, event.analyse_rate);
         statement.bindString(3, event.start_time);
@@ -95,17 +116,36 @@ public class SQLiteManager {
         return event_id;
     }
 
-    public void addDataToEvent(long event_id, int spo2h, int offset_time) {
-        SQLiteStatement statement = mDBOpener.getWritableDatabase().compileStatement(STATEMENT_INSERT_DATA);
-        statement.bindLong(1, event_id);
-        statement.bindLong(2, spo2h);
-        statement.bindLong(3, offset_time);
+    @Override
+    public void addDataToEvent(EventData base_event_data) {
+        SQLiteStatement statement = getDatabase(WRITE_DATABASE).compileStatement(STATEMENT_INSERT_DATA);
+        statement.bindLong(1, base_event_data.event_id);
+        statement.bindLong(2, base_event_data.spo2h);
+        statement.bindLong(3, base_event_data.offset_time);
         statement.executeInsert();
     }
 
+    @Override
+    public void addDataToEvent(EventData[] base_event_data) {
+        for (EventData eventData : base_event_data) {
+            addDataToEvent(eventData);
+        }
+    }
+
+    @Override
+    public void deleteEvent(long event_id) {
+        SQLiteStatement statement = getDatabase(WRITE_DATABASE).compileStatement(STATEMENT_DELETE_DATA);
+        statement.bindLong(1, event_id);
+        statement.executeUpdateDelete();
+        statement = getDatabase(WRITE_DATABASE).compileStatement(STATEMENT_DELETE_EVENT);
+        statement.bindLong(1, event_id);
+        statement.executeUpdateDelete();
+    }
+
+    @Override
     public void clearAllData() {
         String sql_delete = "delete from ?";
-        SQLiteDatabase db = mDBOpener.getWritableDatabase();
+        SQLiteDatabase db = getDatabase(WRITE_DATABASE);
         for (Table table : TABLES) {
             db.execSQL(sql_delete, new String[]{table.name});
         }

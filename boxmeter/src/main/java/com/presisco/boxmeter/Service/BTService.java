@@ -123,9 +123,9 @@ public class BTService extends BaseBluetoothService
      * @param data 接收到的蓝牙数据
      */
     @Override
-    public void received(byte[] data) {
+    public void receivedBlock(byte[] data) {
         if (data.length == 5) {
-            getPacketReceivedListener().onReceived(data);
+            getPacketReceivedListener().onPacketReceived(data);
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.heartmeter.UI.Fragment;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,14 +12,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 
+import com.example.heartmeter.Data.Event;
 import com.example.heartmeter.R;
 import com.example.heartmeter.Service.HubService;
 import com.presisco.shared.ui.framework.monitor.LinePanelFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
 import com.presisco.shared.ui.framework.monitor.StringPanelFragment;
+import com.presisco.shared.ui.framework.realtime.RealTimeMode;
 import com.presisco.shared.utils.ByteUtils;
 
 import lecho.lib.hellocharts.util.ChartUtils;
@@ -31,15 +33,25 @@ import lecho.lib.hellocharts.util.ChartUtils;
  * create an instance of this fragment.
  */
 public class RealtimeFragment extends Fragment implements MonitorPanelFragment.ViewCreatedListener {
+
+    private static final int MODE_DEFAULT_HEART_RATE = 0;
+    private static final int MODE_DEFAULT_HEART_RATE_MINUTE = 1;
+    private static final int MODE_DEFAULT_ECG_FIVE_SEC = 2;
+    private static final int MODE_AEROBIC = 3;
+    private static final int MODE_ANAEROBIC = 4;
+    private static final int MODE_SLEEP = 5;
+
     private LocalBroadcastManager mLocalBroadcastManager;
-    private String[] modes;
-    private String[] hints;
     private Spinner mModeSpinner;
     private MonitorHostFragment mMonitorHost;
-    private BroadcastReceiver mCurrentReceiver;
 
-    private int current_mode_id = 0;
     private MonitorPanelFragment mCurrentPanel;
+
+    private Button mStartButton;
+    private Button mStopButton;
+
+    private RealTimeMode[] mRealTimeModes = null;
+    private RealTimeMode mCurrentMode = null;
 
     public RealtimeFragment() {
     }
@@ -55,15 +67,241 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
         return fragment;
     }
 
+    private String[] getTitles() {
+        String[] titles = new String[mRealTimeModes.length];
+        for (int i = 0; i < mRealTimeModes.length; ++i) {
+            titles[i] = mRealTimeModes[i].getModeTitle();
+        }
+        return titles;
+    }
+
+    private void initModes() {
+        final String[] modes_title = getResources().getStringArray(R.array.realtime_modes);
+        final String[] modes_hint = getResources().getStringArray(R.array.realtime_mode_hints);
+        mRealTimeModes = new RealTimeMode[]{
+                //普通模式
+                new RealTimeMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_DEFAULT_HEART_RATE];
+                    }
+
+                    @Override
+                    public String getEventType() {
+                        return Event.TYPE_DEFAULT;
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_STRING;
+                    }
+
+                    @Override
+                    public String getBroadcastAction() {
+                        return HubService.ACTION_HEART_RATE_REDUCED;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_DEFAULT_HEART_RATE]);
+                    }
+
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        ((StringPanelFragment) getPanel()).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    }
+                },
+                new RealTimeMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_DEFAULT_HEART_RATE_MINUTE];
+                    }
+
+                    @Override
+                    public String getEventType() {
+                        return Event.TYPE_DEFAULT;
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_LINE;
+                    }
+
+                    @Override
+                    public String getBroadcastAction() {
+                        return HubService.ACTION_HEART_RATE_REDUCED;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_DEFAULT_HEART_RATE_MINUTE]);
+                        LinePanelFragment linePanel = (LinePanelFragment) getPanel();
+                        linePanel.setAxisYScale(0, 250);
+                        linePanel.setMaxPoints(60);
+                        linePanel.setXStep(1);
+                        linePanel.setAxisXText("Time");
+                        linePanel.setAxisYText("Rate");
+                        LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
+                        style.line_color = ChartUtils.COLOR_BLUE;
+                        style.has_points = false;
+                        linePanel.setLineStyle(style);
+                        linePanel.redraw();
+                    }
+
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        ((LinePanelFragment) getPanel()).appendValue(intent.getIntExtra(HubService.KEY_DATA, 0));
+                    }
+                },
+                new RealTimeMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_DEFAULT_ECG_FIVE_SEC];
+                    }
+
+                    @Override
+                    public String getEventType() {
+                        return Event.TYPE_DEFAULT;
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_LINE;
+                    }
+
+                    @Override
+                    public String getBroadcastAction() {
+                        return HubService.ACTION_ECG;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_DEFAULT_ECG_FIVE_SEC]);
+                        LinePanelFragment linePanel = (LinePanelFragment) getPanel();
+                        linePanel.setAxisYScale(200, 1500);
+                        linePanel.setMaxPoints(500);
+                        linePanel.setXStep(0.01f);
+                        linePanel.setAxisXText("Time");
+                        linePanel.setAxisYText("Voltage");
+                        LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
+                        style.line_color = ChartUtils.COLOR_BLUE;
+                        style.has_points = false;
+                        linePanel.setLineStyle(style);
+                        linePanel.redraw();
+                    }
+
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        int[] ecg_data = intent.getIntArrayExtra(HubService.KEY_DATA);
+                        float[] converted = ByteUtils.intArray2floatArray(ecg_data);
+                        ((LinePanelFragment) getPanel()).appendValue(converted);
+                    }
+                },
+                //有氧模式
+                new RealTimeMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_AEROBIC];
+                    }
+
+                    @Override
+                    public String getEventType() {
+                        return Event.TYPE_AEROBIC;
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_STRING;
+                    }
+
+                    @Override
+                    public String getBroadcastAction() {
+                        return HubService.ACTION_HEART_RATE_REDUCED;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_AEROBIC]);
+                    }
+
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        ((StringPanelFragment) getPanel()).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    }
+                },
+                //无氧模式
+                new RealTimeMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_ANAEROBIC];
+                    }
+
+                    @Override
+                    public String getEventType() {
+                        return Event.TYPE_ANAEROBIC;
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_STRING;
+                    }
+
+                    @Override
+                    public String getBroadcastAction() {
+                        return HubService.ACTION_HEART_RATE_REDUCED;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_ANAEROBIC]);
+                    }
+
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        ((StringPanelFragment) getPanel()).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    }
+                },
+                //睡眠模式
+                new RealTimeMode() {
+                    @Override
+                    public String getModeTitle() {
+                        return modes_title[MODE_SLEEP];
+                    }
+
+                    @Override
+                    public String getEventType() {
+                        return Event.TYPE_SLEEP;
+                    }
+
+                    @Override
+                    public String getPanelType() {
+                        return MonitorHostFragment.PANEL_STRING;
+                    }
+
+                    @Override
+                    public String getBroadcastAction() {
+                        return HubService.ACTION_HEART_RATE_REDUCED;
+                    }
+
+                    @Override
+                    public void initPanelView() {
+                        getPanel().setHint(modes_hint[MODE_SLEEP]);
+                    }
+
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        ((StringPanelFragment) getPanel()).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
+                    }
+                },
+        };
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getContext());
-        modes = getResources().getStringArray(R.array.realtime_modes);
-        hints = getResources().getStringArray(R.array.realtime_mode_hints);
-
+        initModes();
     }
 
     @Override
@@ -81,28 +319,11 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id) {
-                current_mode_id = pos;
-                String action = "";
-                mLocalBroadcastManager.unregisterReceiver(mCurrentReceiver);
-                switch (pos) {
-                    case 0:
-                    case 3:
-                        action = HubService.ACTION_HEART_RATE_REDUCED;
-                        mCurrentReceiver = new HeartRateReceiver();
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_STRING);
-                        break;
-                    case 1:
-                        action = HubService.ACTION_HEART_RATE_VOLUME;
-                        mCurrentReceiver = new HeartVolumeReceiver();
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
-                        break;
-                    case 2:
-                        action = HubService.ACTION_ECG;
-                        mCurrentReceiver = new ECGReceiver();
-                        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
-                        break;
-                }
-                mLocalBroadcastManager.registerReceiver(mCurrentReceiver, new IntentFilter(action));
+                mLocalBroadcastManager.unregisterReceiver(mCurrentMode);
+                mCurrentMode = mRealTimeModes[pos];
+                mMonitorHost.displayPanel(mCurrentMode.getPanelType());
+                mLocalBroadcastManager.registerReceiver(
+                        mCurrentMode, new IntentFilter(mCurrentMode.getBroadcastAction()));
             }
 
             @Override
@@ -110,23 +331,27 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
 
             }
         });
-        mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, modes));
+        mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getTitles()));
 
-        rootView.findViewById(R.id.buttonStart).setOnClickListener(new View.OnClickListener() {
+        mStartButton = (Button) rootView.findViewById(R.id.buttonStart);
+        mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mLocalBroadcastManager.sendBroadcast(
-                        new Intent(HubService.ACTION_SEND_INSTRUCTION)
-                                .putExtra(HubService.KEY_INSTRUCTION, HubService.SEND_START));
-                mCurrentPanel.clear();
+                        new Intent(HubService.ACTION_START_EVENT)
+                                .putExtra(HubService.KEY_EVENT_TYPE, Event.TYPE_DEFAULT));
+                mStartButton.setEnabled(false);
+                mStopButton.setEnabled(true);
             }
         });
-        rootView.findViewById(R.id.buttonStop).setOnClickListener(new View.OnClickListener() {
+        mStopButton = (Button) rootView.findViewById(R.id.buttonStop);
+        mStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mLocalBroadcastManager.sendBroadcast(
-                        new Intent(HubService.ACTION_SEND_INSTRUCTION)
-                                .putExtra(HubService.KEY_INSTRUCTION, HubService.SEND_STOP));
+                        new Intent(HubService.ACTION_STOP_EVENT));
+                mStartButton.setEnabled(true);
+                mStopButton.setEnabled(false);
             }
         });
 
@@ -142,75 +367,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     public void panelViewCreated(MonitorPanelFragment panel) {
         mCurrentPanel = panel;
         mCurrentPanel.clear();
-        mCurrentPanel.setTitle(modes[current_mode_id]);
-        mCurrentPanel.setHint(hints[current_mode_id]);
-        switch (current_mode_id) {
-            case 1:
-                LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
-                linePanel.setAxisYScale(0, 250);
-                linePanel.setMaxPoints(60);
-                linePanel.setXStep(1);
-                linePanel.setAxisXText("Time");
-                linePanel.setAxisYText("Rate");
-                LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
-                style.line_color = ChartUtils.COLOR_BLUE;
-                style.has_points = false;
-                linePanel.setLineStyle(style);
-                linePanel.redraw();
-                break;
-            case 2:
-                linePanel = (LinePanelFragment) mCurrentPanel;
-                linePanel.setAxisYScale(400, 600);
-                linePanel.setMaxPoints(500);
-                linePanel.setXStep(0.01f);
-                linePanel.setAxisXText("Time");
-                linePanel.setAxisYText("Voltage");
-                style = new LinePanelFragment.LineStyle();
-                style.line_color = ChartUtils.COLOR_BLUE;
-                style.has_points = false;
-                linePanel.setLineStyle(style);
-                linePanel.redraw();
-                break;
-        }
-    }
-
-    private class HeartRateReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (current_mode_id) {
-                case 0:
-                case 3:
-                    ((StringPanelFragment) mCurrentPanel).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
-                    break;
-            }
-        }
-    }
-
-    private class HeartVolumeReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
-            switch (current_mode_id) {
-                case 1:
-                    int[] heart_rate_data = intent.getIntArrayExtra(HubService.KEY_DATA);
-                    float[] converted = ByteUtils.intArray2floatArray(heart_rate_data);
-                    linePanel.appendValue(converted);
-                    break;
-            }
-        }
-    }
-
-    private class ECGReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            LinePanelFragment linePanel = (LinePanelFragment) mCurrentPanel;
-            switch (current_mode_id) {
-                case 2:
-                    int[] ecg_data = intent.getIntArrayExtra(HubService.KEY_DATA);
-                    float[] converted = ByteUtils.intArray2floatArray(ecg_data);
-                    linePanel.appendValue(converted);
-                    break;
-            }
-        }
+        mCurrentMode.setPanel(mCurrentPanel);
+        mCurrentMode.initPanelView();
     }
 }

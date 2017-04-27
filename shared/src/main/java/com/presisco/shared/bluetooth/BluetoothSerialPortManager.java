@@ -197,15 +197,15 @@ public class BluetoothSerialPortManager {
     }
 
     public interface ByteListener {
-        void received(byte data);
+        void receivedByte(byte data);
     }
 
     public interface BlockListener {
-        void received(byte[] data);
+        void receivedBlock(byte[] data);
     }
 
     public interface CharListener {
-        void received(String data);
+        void receivedChar(String data);
     }
 
     private class ConnectTask extends AsyncTask<BluetoothDevice, Void, BluetoothSocket> {
@@ -285,7 +285,7 @@ public class BluetoothSerialPortManager {
                         byte byteBuffer = 0x00;
                         while (true) {
                             byteBuffer = (byte) inStream.read();
-                            mByteListener.received(byteBuffer);
+                            mByteListener.receivedByte(byteBuffer);
                         }
                     case DEV_TYPE_BLOCK:
                         byte[] blockBuffer = new byte[mReceiveBufferSize];
@@ -295,7 +295,7 @@ public class BluetoothSerialPortManager {
                             for (int i = 0; i < length; ++i) {
                                 packet[i] = blockBuffer[i];
                             }
-                            mBlockListener.received(packet);
+                            mBlockListener.receivedBlock(packet);
                         }
                 }
             } catch (IOException e) {

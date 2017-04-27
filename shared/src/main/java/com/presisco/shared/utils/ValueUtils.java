@@ -14,4 +14,8 @@ public class ValueUtils {
             return var;
         }
     }
+
+    public static boolean inLimit(int var, int roof, int floor) {
+        return var < roof && var > floor;
+    }
 }
