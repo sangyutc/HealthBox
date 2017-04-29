@@ -42,6 +42,7 @@ public class LinePanelFragment extends ChartPanelFragment {
     private String mAxisYText;
     private float mAxisYMin = 0;
     private float mAxisYMax = 100;
+    private float mAxisXBaseline = 0;
     private float mLastXCoord = 0;
     private float mXStep = 1;
 
@@ -75,6 +76,10 @@ public class LinePanelFragment extends ChartPanelFragment {
     public void setAxisYScale(float min, float max) {
         mAxisYMax = max;
         mAxisYMin = min;
+    }
+
+    public void setAxisXBaseline(float baseline) {
+        mAxisXBaseline = baseline;
     }
 
     public void setLineStyle(LineStyle lineStyle) {
@@ -132,11 +137,13 @@ public class LinePanelFragment extends ChartPanelFragment {
     @Override
     public void redraw() {
         initChart();
+        resetViewport();
     }
 
     @Override
     public void clear() {
         mPoints.clear();
+        mLastXCoord = mAxisXBaseline;
         resetViewport();
         initChart();
     }
@@ -203,9 +210,9 @@ public class LinePanelFragment extends ChartPanelFragment {
         final Viewport v = new Viewport(mLineChart.getMaximumViewport());
         v.bottom = mAxisYMin;
         v.top = mAxisYMax;
-        if (mLastXCoord < mMaxPoints * mXStep) {
-            v.left = 0;
-            v.right = mMaxPoints * mXStep;
+        if (mLastXCoord < mAxisXBaseline + mMaxPoints * mXStep) {
+            v.left = mAxisXBaseline;
+            v.right = mAxisXBaseline + mMaxPoints * mXStep;
         } else {
             v.left = mLastXCoord - mMaxPoints * mXStep;
             v.right = mLastXCoord;
@@ -215,12 +222,11 @@ public class LinePanelFragment extends ChartPanelFragment {
     }
 
     private void resetViewport() {
-        // Reset viewport height range to (0,100)
         final Viewport v = new Viewport(mLineChart.getMaximumViewport());
         v.bottom = mAxisYMin;
         v.top = mAxisYMax;
-        v.left = 0;
-        v.right = mMaxPoints * mXStep;
+        v.left = mAxisXBaseline;
+        v.right = mAxisXBaseline + mMaxPoints * mXStep;
         mLineChart.setMaximumViewport(v);
         mLineChart.setCurrentViewport(v);
     }

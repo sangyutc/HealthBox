@@ -45,8 +45,8 @@
 
     <string-array name="realtime_mode_hints">
         <item>常规，显示心率数据</item>
-        <item>常规，显示2秒内心率曲线</item>
-        <item>常规，显示2秒内心电曲线</item>
+        <item>常规，显示1分钟内心率曲线</item>
+        <item>常规，显示5秒内心电曲线</item>
         <item>慢跑，游泳等</item>
         <item>冲刺，球类运动等</item>
         <item>睡眠参数检测</item>
