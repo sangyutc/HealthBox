@@ -178,7 +178,7 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
                     public void initPanelView() {
                         getPanel().setHint(modes_hint[MODE_DEFAULT_ECG_FIVE_SEC]);
                         LinePanelFragment linePanel = (LinePanelFragment) getPanel();
-                        linePanel.setAxisYScale(200, 1500);
+                        linePanel.setAxisYScale(400, 600);
                         linePanel.setMaxPoints(500);
                         linePanel.setXStep(0.01f);
                         linePanel.setAxisXText("Time");
