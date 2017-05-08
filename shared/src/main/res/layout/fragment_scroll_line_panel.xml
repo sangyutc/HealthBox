@@ -13,11 +13,21 @@
         android:textSize="@dimen/value_panel_hint_fontsize" />
 
     <view
-        android:id="@+id/previewLineChart"
+        android:id="@+id/lineChart"
         class="lecho.lib.hellocharts.view.PreviewLineChartView"
         id="@+id/view2"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="260dp"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/textView" />
+
+    <view
+        android:id="@+id/previewLineChart"
+        class="lecho.lib.hellocharts.view.PreviewLineChartView"
+        id="@+id/view"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/lineChart" />
 
 </RelativeLayout>

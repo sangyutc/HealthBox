@@ -45,6 +45,7 @@ public class LinePanelFragment extends ChartPanelFragment {
     private float mAxisXBaseline = 0;
     private float mLastXCoord = 0;
     private float mXStep = 1;
+    private boolean mScrollable = false;
 
     private LineStyle mLineStyle = new LineStyle();
 
@@ -90,11 +91,15 @@ public class LinePanelFragment extends ChartPanelFragment {
         mXStep = step;
     }
 
+    public void setScrollable(boolean flag) {
+        mScrollable = flag;
+    }
+
     public void appendPoints(PointValue[] points) {
         for (PointValue point : points) {
             mPoints.add(point);
             mLastXCoord += mXStep;
-            if (mPoints.size() > mMaxPoints) {
+            if (mPoints.size() > mMaxPoints && (!mScrollable)) {
                 mPoints.remove(0);
             }
         }
@@ -104,7 +109,7 @@ public class LinePanelFragment extends ChartPanelFragment {
 
     public void appendPoint(PointValue point) {
         mPoints.add(point);
-        if (mPoints.size() > mMaxPoints) {
+        if (mPoints.size() > mMaxPoints && (!mScrollable)) {
             mPoints.remove(0);
         }
         mLastXCoord += mXStep;
@@ -114,11 +119,13 @@ public class LinePanelFragment extends ChartPanelFragment {
 
     public void appendValue(float value) {
         mPoints.add(new PointValue(mLastXCoord + mXStep, value));
-        if (mPoints.size() > mMaxPoints) {
+        if (mPoints.size() > mMaxPoints && (!mScrollable)) {
             mPoints.remove(0);
         }
         mLastXCoord += mXStep;
-        scrollViewport();
+        if (!mScrollable) {
+            scrollViewport();
+        }
         initChart();
     }
 
@@ -126,11 +133,13 @@ public class LinePanelFragment extends ChartPanelFragment {
         for (int i = 1; i < values.length; ++i) {
             mPoints.add(new PointValue(mLastXCoord + mXStep, values[i]));
             mLastXCoord += mXStep;
-            if (mPoints.size() > mMaxPoints) {
+            if (mPoints.size() > mMaxPoints && (!mScrollable)) {
                 mPoints.remove(0);
             }
         }
-        scrollViewport();
+        if (mScrollable) {
+            scrollViewport();
+        }
         initChart();
     }
 
@@ -144,8 +153,8 @@ public class LinePanelFragment extends ChartPanelFragment {
     public void clear() {
         mPoints.clear();
         mLastXCoord = mAxisXBaseline;
-        resetViewport();
         initChart();
+        resetViewport();
     }
 
     @Override
@@ -185,6 +194,7 @@ public class LinePanelFragment extends ChartPanelFragment {
         mLineData.setBaseValue(Float.NEGATIVE_INFINITY);
 
         mLineChart.setLineChartData(mLineData);
+        mLineChart.setScrollEnabled(mScrollable);
     }
 
     @Override
@@ -207,18 +217,35 @@ public class LinePanelFragment extends ChartPanelFragment {
     }
 
     private void scrollViewport() {
-        final Viewport v = new Viewport(mLineChart.getMaximumViewport());
-        v.bottom = mAxisYMin;
-        v.top = mAxisYMax;
-        if (mLastXCoord < mAxisXBaseline + mMaxPoints * mXStep) {
-            v.left = mAxisXBaseline;
-            v.right = mAxisXBaseline + mMaxPoints * mXStep;
+        final Viewport maximum_viewport = new Viewport(mLineChart.getMaximumViewport());
+        final Viewport current_viewport = new Viewport(mLineChart.getCurrentViewport());
+        maximum_viewport.bottom = mAxisYMin;
+        maximum_viewport.top = mAxisYMax;
+        current_viewport.bottom = mAxisYMin;
+        current_viewport.top = mAxisYMax;
+        if (mScrollable) {
+            maximum_viewport.left = mAxisXBaseline;
+            if (mLastXCoord > mAxisXBaseline + mMaxPoints * mXStep) {
+                maximum_viewport.right = mLastXCoord;
+                current_viewport.right = mLastXCoord;
+            } else {
+                maximum_viewport.right = mAxisXBaseline + mMaxPoints * mXStep;
+                current_viewport.right = mAxisXBaseline + mMaxPoints * mXStep;
+            }
+            current_viewport.left = mLastXCoord - mMaxPoints * mXStep;
+            mLineChart.setMaximumViewport(maximum_viewport);
+            mLineChart.setCurrentViewport(current_viewport);
         } else {
-            v.left = mLastXCoord - mMaxPoints * mXStep;
-            v.right = mLastXCoord;
+            if (mLastXCoord < mAxisXBaseline + mMaxPoints * mXStep) {
+                maximum_viewport.left = mAxisXBaseline;
+                maximum_viewport.right = mAxisXBaseline + mMaxPoints * mXStep;
+            } else {
+                maximum_viewport.left = mLastXCoord - mMaxPoints * mXStep;
+                maximum_viewport.right = mLastXCoord;
+            }
+            mLineChart.setMaximumViewport(maximum_viewport);
+            mLineChart.setCurrentViewport(maximum_viewport);
         }
-        mLineChart.setMaximumViewport(v);
-        mLineChart.setCurrentViewport(v);
     }
 
     private void resetViewport() {

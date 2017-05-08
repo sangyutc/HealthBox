@@ -12,7 +12,10 @@ import com.presisco.boxmeter.storage.SQLiteManager;
 import com.presisco.shared.data.BaseEvent;
 import com.presisco.shared.data.BaseEventData;
 import com.presisco.shared.ui.fragment.BaseHistoryFragment;
+import com.presisco.shared.ui.framework.monitor.LinePanelFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
+
+import lecho.lib.hellocharts.util.ChartUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +50,9 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
         final String[] modes_hint = getResources().getStringArray(R.array.history_mode_hints);
         mAnalyseModes = new TypedHistoryMode[]{
                 new TypedHistoryMode() {
+                    private EventData[] raw_data;
+                    private int analyse_rate;
+
                     @Override
                     public String getModeTitle() {
                         return modes_title[MODE_DEFAULT];
@@ -54,7 +60,7 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
 
                     @Override
                     public String getPanelType() {
-                        return MonitorHostFragment.PANEL_SCROLL_LINE;
+                        return MonitorHostFragment.PANEL_LINE;
                     }
 
                     @Override
@@ -64,12 +70,29 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
 
                     @Override
                     public void analyseData(EventData[] data, int analyse_rate) {
-
+                        raw_data = data;
+                        this.analyse_rate = analyse_rate;
                     }
 
                     @Override
                     public void displayResult() {
-
+                        LinePanelFragment panel = (LinePanelFragment) getPanel();
+                        panel.clear();
+                        LinePanelFragment.LineStyle main_line_style = new LinePanelFragment.LineStyle();
+                        main_line_style.line_color = ChartUtils.COLOR_BLUE;
+                        panel.setLineStyle(main_line_style);
+                        panel.setAxisYScale(0, 110);
+                        panel.setMaxPoints(60);
+                        panel.setXStep(1);
+                        panel.setAxisXText("Time");
+                        panel.setAxisYText("SPO2H");
+                        panel.setScrollable(true);
+                        // panel.redraw();
+                        float[] data = new float[raw_data.length];
+                        for (int i = 0; i < raw_data.length; ++i) {
+                            data[i] = raw_data[i].spo2h;
+                        }
+                        panel.appendValue(data);
                     }
                 },
                 new TypedHistoryMode() {
@@ -162,7 +185,7 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
             mDataManager = new SQLiteManager(getContext());
         }
         setChildListener(this);
-        setHistoyModes(mAnalyseModes);
+        setHistoryModes(mAnalyseModes);
     }
 
     @Override

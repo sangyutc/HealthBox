@@ -2,25 +2,15 @@ package com.example.heartmeter.UI.Fragment;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.LocalBroadcastManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
 
 import com.example.heartmeter.Data.Event;
 import com.example.heartmeter.R;
 import com.example.heartmeter.Service.HubService;
+import com.presisco.shared.ui.fragment.BaseRealTimeFragment;
 import com.presisco.shared.ui.framework.monitor.LinePanelFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
-import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
 import com.presisco.shared.ui.framework.monitor.StringPanelFragment;
 import com.presisco.shared.ui.framework.realtime.RealTimeMode;
 import com.presisco.shared.utils.ByteUtils;
@@ -29,10 +19,10 @@ import lecho.lib.hellocharts.util.ChartUtils;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link RealtimeFragment#newInstance} factory method to
+ * Use the {@link RealTimeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RealtimeFragment extends Fragment implements MonitorPanelFragment.ViewCreatedListener {
+public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTimeFragment.ActionListener {
 
     private static final int MODE_DEFAULT_HEART_RATE = 0;
     private static final int MODE_DEFAULT_HEART_RATE_MINUTE = 1;
@@ -41,19 +31,9 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     private static final int MODE_ANAEROBIC = 4;
     private static final int MODE_SLEEP = 5;
 
-    private LocalBroadcastManager mLocalBroadcastManager;
-    private Spinner mModeSpinner;
-    private MonitorHostFragment mMonitorHost;
-
-    private MonitorPanelFragment mCurrentPanel;
-
-    private Button mStartButton;
-    private Button mStopButton;
-
     private RealTimeMode[] mRealTimeModes = null;
-    private RealTimeMode mCurrentMode = null;
 
-    public RealtimeFragment() {
+    public RealTimeFragment() {
     }
 
     /**
@@ -62,17 +42,9 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
      *
      * @return A new instance of fragment HistoryFragment.
      */
-    public static RealtimeFragment newInstance() {
-        RealtimeFragment fragment = new RealtimeFragment();
+    public static RealTimeFragment newInstance() {
+        RealTimeFragment fragment = new RealTimeFragment();
         return fragment;
-    }
-
-    private String[] getTitles() {
-        String[] titles = new String[mRealTimeModes.length];
-        for (int i = 0; i < mRealTimeModes.length; ++i) {
-            titles[i] = mRealTimeModes[i].getModeTitle();
-        }
-        return titles;
     }
 
     private void initModes() {
@@ -299,63 +271,9 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mLocalBroadcastManager = LocalBroadcastManager.getInstance(getContext());
         initModes();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_realtime, container, false);
-        mMonitorHost = MonitorHostFragment.newInstance();
-        mMonitorHost.setPanelViewCreatedListener(this);
-        FragmentTransaction trans = getChildFragmentManager().beginTransaction();
-        trans.replace(R.id.monitorHost, mMonitorHost);
-        trans.commit();
-
-        mModeSpinner = (Spinner) rootView.findViewById(R.id.spinnerMode);
-        mModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int pos, long id) {
-                mLocalBroadcastManager.unregisterReceiver(mCurrentMode);
-                mCurrentMode = mRealTimeModes[pos];
-                mMonitorHost.displayPanel(mCurrentMode.getPanelType());
-                mLocalBroadcastManager.registerReceiver(
-                        mCurrentMode, new IntentFilter(mCurrentMode.getBroadcastAction()));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getTitles()));
-
-        mStartButton = (Button) rootView.findViewById(R.id.buttonStart);
-        mStartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLocalBroadcastManager.sendBroadcast(
-                        new Intent(HubService.ACTION_START_EVENT)
-                                .putExtra(HubService.KEY_EVENT_TYPE, Event.TYPE_DEFAULT));
-                mStartButton.setEnabled(false);
-                mStopButton.setEnabled(true);
-            }
-        });
-        mStopButton = (Button) rootView.findViewById(R.id.buttonStop);
-        mStopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLocalBroadcastManager.sendBroadcast(
-                        new Intent(HubService.ACTION_STOP_EVENT));
-                mStartButton.setEnabled(true);
-                mStopButton.setEnabled(false);
-            }
-        });
-
-        return rootView;
+        setChildListener(this);
+        setRealTimeModes(mRealTimeModes);
     }
 
     @Override
@@ -364,10 +282,15 @@ public class RealtimeFragment extends Fragment implements MonitorPanelFragment.V
     }
 
     @Override
-    public void panelViewCreated(MonitorPanelFragment panel) {
-        mCurrentPanel = panel;
-        mCurrentPanel.clear();
-        mCurrentMode.setPanel(mCurrentPanel);
-        mCurrentMode.initPanelView();
+    public void startEvent(RealTimeMode mode) {
+        getLocalBroadcastmanager().sendBroadcast(
+                new Intent(HubService.ACTION_START_EVENT)
+                        .putExtra(HubService.KEY_EVENT_TYPE, mode.getEventType()));
+    }
+
+    @Override
+    public void endEvent(RealTimeMode mode) {
+        getLocalBroadcastmanager().sendBroadcast(
+                new Intent(HubService.ACTION_STOP_EVENT));
     }
 }

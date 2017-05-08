@@ -35,7 +35,6 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
     private HistoryMode mCurrentMode = null;
     private BaseEvent[] mEvents = null;
     private ArrayList<String> mEventTitles = new ArrayList<>();
-
     public BaseHistoryFragment() {
         // Required empty public constructor
     }
@@ -44,7 +43,7 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
         mChildListener = listener;
     }
 
-    protected void setHistoyModes(HistoryMode[] modes) {
+    protected void setHistoryModes(HistoryMode[] modes) {
         mHistoryModes = modes;
     }
 
@@ -69,7 +68,9 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_base_history, container, false);
-        mMonitorHost = MonitorHostFragment.newInstance();
+        if (mMonitorHost == null) {
+            mMonitorHost = MonitorHostFragment.newInstance();
+        }
         mMonitorHost.setPanelViewCreatedListener(this);
         FragmentTransaction trans = getChildFragmentManager().beginTransaction();
         trans.replace(R.id.monitorHost, mMonitorHost);

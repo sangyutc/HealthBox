@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.presisco.boxmeter.R;
 import com.presisco.boxmeter.UI.Fragment.HistoryFragment;
 import com.presisco.boxmeter.UI.Fragment.PersonalFragment;
-import com.presisco.boxmeter.UI.Fragment.RealtimeFragment;
+import com.presisco.boxmeter.UI.Fragment.RealTimeFragment;
 import com.presisco.shared.ui.framework.clicktabslayout.ClickTabsFramework;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         Resources res = getResources();
         mContentPages = new ContentPage[]{
                 new ContentPage(
-                        RealtimeFragment.newInstance(),
+                        RealTimeFragment.newInstance(),
                         res.getString(R.string.title_realtime),
                         R.drawable.ic_realtime_default,
                         R.drawable.ic_realtime_selected,

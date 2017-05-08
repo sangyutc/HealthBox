@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.example.heartmeter.R;
 import com.example.heartmeter.UI.Fragment.HistoryFragment;
 import com.example.heartmeter.UI.Fragment.PersonalFragment;
-import com.example.heartmeter.UI.Fragment.RealtimeFragment;
+import com.example.heartmeter.UI.Fragment.RealTimeFragment;
 import com.presisco.shared.ui.framework.clicktabslayout.ClickTabsFramework;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         Resources res = getResources();
         mContentPages = new ContentPage[]{
                 new ContentPage(
-                        RealtimeFragment.newInstance(),
+                        RealTimeFragment.newInstance(),
                         res.getString(R.string.title_realtime),
                         R.drawable.ic_realtime_default,
                         R.drawable.ic_realtime_selected,
