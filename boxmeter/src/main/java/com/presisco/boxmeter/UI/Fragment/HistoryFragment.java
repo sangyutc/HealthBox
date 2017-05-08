@@ -3,38 +3,30 @@ package com.presisco.boxmeter.UI.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
+import com.presisco.boxmeter.Data.Event;
 import com.presisco.boxmeter.Data.EventData;
 import com.presisco.boxmeter.R;
 import com.presisco.boxmeter.UI.history.TypedHistoryMode;
+import com.presisco.boxmeter.storage.SQLiteManager;
+import com.presisco.shared.data.BaseEvent;
+import com.presisco.shared.data.BaseEventData;
+import com.presisco.shared.ui.fragment.BaseHistoryFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
-import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HistoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HistoryFragment extends Fragment implements MonitorPanelFragment.ViewCreatedListener {
+public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryFragment.ActionListener {
     private static final int MODE_DEFAULT = 0;
     private static final int MODE_AEROBIC = 1;
     private static final int MODE_ANAEROBIC = 2;
     private static final int MODE_SLEEP = 3;
-    private Spinner mModeSpinner;
-    private Spinner mEventSpinner;
-    private MonitorHostFragment mMonitorHost;
+    private SQLiteManager mDataManager;
 
     private TypedHistoryMode[] mAnalyseModes = null;
-    private TypedHistoryMode mCurrentMode = null;
-
-    private MonitorPanelFragment mCurrentPanel = null;
 
     public HistoryFragment() {
     }
@@ -51,8 +43,8 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
     }
 
     private void initModes() {
-        final String[] modes_title = getResources().getStringArray(R.array.realtime_modes);
-        final String[] modes_hint = getResources().getStringArray(R.array.realtime_mode_hints);
+        final String[] modes_title = getResources().getStringArray(R.array.history_modes);
+        final String[] modes_hint = getResources().getStringArray(R.array.history_mode_hints);
         mAnalyseModes = new TypedHistoryMode[]{
                 new TypedHistoryMode() {
                     @Override
@@ -76,7 +68,7 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
                     }
 
                     @Override
-                    public void displayData() {
+                    public void displayResult() {
 
                     }
                 },
@@ -102,7 +94,7 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
                     }
 
                     @Override
-                    public void displayData() {
+                    public void displayResult() {
 
                     }
                 },
@@ -128,7 +120,7 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
                     }
 
                     @Override
-                    public void displayData() {
+                    public void displayResult() {
 
                     }
                 },
@@ -154,7 +146,7 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
                     }
 
                     @Override
-                    public void displayData() {
+                    public void displayResult() {
 
                     }
                 },
@@ -166,50 +158,41 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initModes();
-    }
-
-    private String[] getTitles() {
-        String[] titles = new String[mAnalyseModes.length];
-        for (int i = 0; i < mAnalyseModes.length; ++i) {
-            titles[i] = mAnalyseModes[i].getModeTitle();
+        if (mDataManager == null) {
+            mDataManager = new SQLiteManager(getContext());
         }
-        return titles;
-    }
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_history, container, false);
-        mMonitorHost = MonitorHostFragment.newInstance();
-        mMonitorHost.setPanelViewCreatedListener(this);
-        FragmentTransaction trans = getChildFragmentManager().beginTransaction();
-        trans.replace(R.id.monitorHost, mMonitorHost);
-        trans.commit();
-
-        mModeSpinner = (Spinner) rootView.findViewById(R.id.modeSpinner);
-        mModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int pos, long id) {
-                mCurrentMode = mAnalyseModes[pos];
-                mMonitorHost.displayPanel(mCurrentMode.getPanelType());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getTitles()));
-        return rootView;
+        setChildListener(this);
+        setHistoyModes(mAnalyseModes);
     }
 
     @Override
-    public void panelViewCreated(MonitorPanelFragment panel) {
-        mCurrentPanel = panel;
-        mCurrentPanel.clear();
-        mCurrentMode.initPanelView();
+    public BaseEvent[] loadEvents(int position) {
+        String type = null;
+        switch (position) {
+            case MODE_DEFAULT:
+                type = Event.TYPE_DEFAULT;
+                break;
+            case MODE_AEROBIC:
+                type = Event.TYPE_AEROBIC;
+                break;
+            case MODE_ANAEROBIC:
+                type = Event.TYPE_ANAEROBIC;
+                break;
+            case MODE_SLEEP:
+                type = Event.TYPE_SLEEP;
+                break;
+        }
+        return mDataManager.getEventsByType(type);
+    }
+
+    @Override
+    public BaseEventData[] loadEventData(long event_id) {
+        return mDataManager.getAllDataInEvent(event_id);
+    }
+
+    @Override
+    public void deleteEvent() {
+
     }
 
     private class AnalyseTask extends AsyncTask<Void, Void, Void> {

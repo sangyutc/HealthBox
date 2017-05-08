@@ -19,8 +19,8 @@ public class ScrollLinePanelFragment extends ChartPanelFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_scroll_line_panel, container);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.fragment_scroll_line_panel, container, false);
+        return rootView;
     }
 
     @Override

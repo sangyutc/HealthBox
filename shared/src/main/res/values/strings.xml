@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">shared</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="label_delete">删除</string>
+    <string name="label_monitor_mode">监控模式</string>
+    <string name="label_history_mode">历史模式</string>
+    <string name="label_event">事件</string>
+    <string name="label_start">开始</string>
+    <string name="label_stop">停止</string>
 </resources>

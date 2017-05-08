@@ -98,6 +98,7 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
         EventData[] data = new EventData[cursor.getCount()];
         int index = 0;
         while (cursor.moveToNext()) {
+            data[index] = new EventData();
             data[index].event_id = event_id;
             data[index].spo2h = (int) cursor.getLong(cursor.getColumnIndex(COLUMN_SPO2H));
             data[index].offset_time = (int) cursor.getLong(cursor.getColumnIndex(COLUMN_OFFSET_TIME));

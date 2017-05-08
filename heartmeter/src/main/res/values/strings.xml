@@ -60,7 +60,7 @@
     </string-array>
 
     <string-array name="history_mode_hints">
-        <item>全部运动</item>
+        <item>常规记录</item>
         <item>所有有氧运动记录</item>
         <item>所有无氧运动记录</item>
         <item>睡眠状态记录</item>

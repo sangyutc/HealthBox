@@ -16,6 +16,7 @@
     <string name="label_apply">提交</string>
     <string name="label_signup">注册</string>
     <string name="text_wrong_password">密码不正确</string>
+    <string name="label_delete">删除</string>
 
     <string-array name="title_warning_bt">
         <item>警告：</item>
@@ -60,7 +61,7 @@
     </string-array>
 
     <string-array name="history_mode_hints">
-        <item>全部运动</item>
+        <item>常规记录</item>
         <item>所有有氧运动记录</item>
         <item>所有无氧运动记录</item>
         <item>睡眠状态记录</item>

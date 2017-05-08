@@ -5,8 +5,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.presisco.boxmeter.Data.Event;
 import com.presisco.boxmeter.R;
 import com.presisco.boxmeter.Service.HubService;
+import com.presisco.boxmeter.storage.SQLiteManager;
 
 import java.util.concurrent.Executors;
 
@@ -30,6 +32,11 @@ public class WelcomeActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             startService(new Intent(WelcomeActivity.this, HubService.class));
+            SQLiteManager mDataManager = new SQLiteManager(WelcomeActivity.this);
+            Event[] events = mDataManager.getEventsByType(Event.TYPE_DEFAULT);
+            for (Event event : events) {
+                //LCAT.d(this,)
+            }
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {

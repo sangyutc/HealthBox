@@ -57,7 +57,7 @@ public class HistoryFragment extends Fragment implements MonitorPanelFragment.Vi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_history, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_base_history, container, false);
         mMonitorHost = MonitorHostFragment.newInstance();
         mMonitorHost.setPanelViewCreatedListener(this);
         FragmentTransaction trans = getChildFragmentManager().beginTransaction();

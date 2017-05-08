@@ -62,5 +62,5 @@ public abstract class HistoryMode<EVENT_DATA> {
     /**
      * 对测量到的结果进行呈现
      */
-    public abstract void displayData();
+    public abstract void displayResult();
 }
