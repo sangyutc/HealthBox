@@ -31,7 +31,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".UI.Activity.SurveyActivity"></activity>
+        <activity android:name=".UI.Activity.SurveyActivity" />
+        <activity android:name=".UI.Activity.DBDebugActivity"></activity>
     </application>
 
 </manifest>

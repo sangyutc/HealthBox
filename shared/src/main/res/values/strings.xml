@@ -8,4 +8,10 @@
     <string name="label_event">事件</string>
     <string name="label_start">开始</string>
     <string name="label_stop">停止</string>
+    <string name="label_sign_up">注册</string>
+    <string name="label_login">登陆</string>
+    <string name="label_username">用户名</string>
+    <string name="label_comment">评价</string>
+    <string name="label_instant_upload">立刻上传</string>
+    <string name="label_reconnect_bt">重新连接蓝牙设备</string>
 </resources>

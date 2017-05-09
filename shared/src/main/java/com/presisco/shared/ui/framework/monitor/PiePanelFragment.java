@@ -1,6 +1,5 @@
 package com.presisco.shared.ui.framework.monitor;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +55,10 @@ public class PiePanelFragment extends ChartPanelFragment {
         mHint.setText(hint);
     }
 
+    public void setStyle(PieStyle style) {
+        mPieStyle = style;
+    }
+
     public void appendSlices(SliceValue[] slices) {
         for (SliceValue slice : slices) {
             mSlices.add(slice);
@@ -104,8 +107,6 @@ public class PiePanelFragment extends ChartPanelFragment {
     }
 
     public static class PieStyle {
-        public static final int COLOR_LINE_DEFAULT = Color.parseColor("#DFDFDF");
-        public static final int COLOR_POINT_DEFAULT = Color.parseColor("#DFDFDF");
 
         public boolean has_label = false;
         public boolean has_label_selected = false;

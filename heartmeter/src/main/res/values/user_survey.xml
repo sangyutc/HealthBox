@@ -58,7 +58,7 @@
         <item>经常</item>
         <item>总是</item>
     </string-array>
-    <string name="label_trust">您对于血样检测软件的信任度是</string>
+    <string name="label_trust">您对于本系列软件的信任度是</string>
     <string-array name="trust">
         <item>非常信任</item>
         <item>比较信任</item>

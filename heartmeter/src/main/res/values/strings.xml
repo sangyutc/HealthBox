@@ -15,7 +15,7 @@
     <string name="label_repeat_password">重复输入一次密码</string>
     <string name="label_cancel">取消</string>
     <string name="label_apply">提交</string>
-    <string name="label_signup">注册</string>
+    <string name="label_sign_up">注册</string>
     <string name="text_wrong_password">密码不正确</string>
 
     <string-array name="title_warning_bt">

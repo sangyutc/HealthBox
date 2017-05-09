@@ -116,7 +116,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
                         LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
                         style.line_color = ChartUtils.COLOR_BLUE;
                         style.has_points = false;
-                        linePanel.setLineStyle(style);
+                        linePanel.setStyle(style);
                         linePanel.redraw();
                     }
 
@@ -158,7 +158,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
                         LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
                         style.line_color = ChartUtils.COLOR_BLUE;
                         style.has_points = false;
-                        linePanel.setLineStyle(style);
+                        linePanel.setStyle(style);
                         linePanel.redraw();
                     }
 

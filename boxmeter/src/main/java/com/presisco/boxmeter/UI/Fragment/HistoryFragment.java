@@ -1,20 +1,21 @@
 package com.presisco.boxmeter.UI.Fragment;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.presisco.boxmeter.Data.Event;
 import com.presisco.boxmeter.Data.EventData;
 import com.presisco.boxmeter.R;
-import com.presisco.boxmeter.UI.history.TypedHistoryMode;
 import com.presisco.boxmeter.storage.SQLiteManager;
 import com.presisco.shared.data.BaseEvent;
 import com.presisco.shared.data.BaseEventData;
 import com.presisco.shared.ui.fragment.BaseHistoryFragment;
+import com.presisco.shared.ui.framework.history.HistoryMode;
 import com.presisco.shared.ui.framework.monitor.LinePanelFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
+import com.presisco.shared.ui.framework.monitor.PiePanelFragment;
 
+import lecho.lib.hellocharts.model.SliceValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 
 /**
@@ -80,7 +81,7 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
                         panel.clear();
                         LinePanelFragment.LineStyle main_line_style = new LinePanelFragment.LineStyle();
                         main_line_style.line_color = ChartUtils.COLOR_BLUE;
-                        panel.setLineStyle(main_line_style);
+                        panel.setStyle(main_line_style);
                         panel.setAxisYScale(0, 110);
                         panel.setMaxPoints(60);
                         panel.setXStep(1);
@@ -96,6 +97,12 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
                     }
                 },
                 new TypedHistoryMode() {
+                    private SliceValue[] result = new SliceValue[]{
+                            new SliceValue(),
+                            new SliceValue(),
+                            new SliceValue()
+                    };
+
                     @Override
                     public String getModeTitle() {
                         return modes_title[MODE_AEROBIC];
@@ -113,15 +120,45 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
 
                     @Override
                     public void analyseData(EventData[] data, int analyse_rate) {
-
+                        int[] counter = new int[]{0, 0, 0};
+                        for (int i = 0; i < data.length; ++i) {
+                            if (data[i].spo2h > 95) {
+                                counter[2]++;
+                            } else if (data[i].spo2h > 85) {
+                                counter[1]++;
+                            } else {
+                                counter[0]++;
+                            }
+                        }
+                        result[0].setValue(counter[0]);
+                        result[0].setLabel("Low");
+                        result[0].setColor(ChartUtils.COLOR_RED);
+                        result[1].setValue(counter[1]);
+                        result[1].setLabel("Normal");
+                        result[1].setColor(ChartUtils.COLOR_GREEN);
+                        result[2].setValue(counter[2]);
+                        result[2].setLabel("High");
+                        result[2].setColor(ChartUtils.COLOR_VIOLET);
                     }
 
                     @Override
                     public void displayResult() {
-
+                        PiePanelFragment panel = (PiePanelFragment) getPanel();
+                        panel.clear();
+                        PiePanelFragment.PieStyle style = new PiePanelFragment.PieStyle();
+                        style.has_label = true;
+                        style.has_label_outside = false;
+                        panel.setStyle(style);
+                        panel.appendSlices(result);
                     }
                 },
                 new TypedHistoryMode() {
+                    private SliceValue[] result = new SliceValue[]{
+                            new SliceValue(),
+                            new SliceValue(),
+                            new SliceValue()
+                    };
+
                     @Override
                     public String getModeTitle() {
                         return modes_title[MODE_ANAEROBIC];
@@ -140,14 +177,45 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
                     @Override
                     public void analyseData(EventData[] data, int analyse_rate) {
 
+                        int[] counter = new int[]{0, 0, 0};
+                        for (int i = 0; i < data.length; ++i) {
+                            if (data[i].spo2h > 95) {
+                                counter[2]++;
+                            } else if (data[i].spo2h > 85) {
+                                counter[1]++;
+                            } else {
+                                counter[0]++;
+                            }
+                        }
+                        result[0].setValue(counter[0]);
+                        result[0].setLabel("Low");
+                        result[0].setColor(ChartUtils.COLOR_RED);
+                        result[1].setValue(counter[1]);
+                        result[1].setLabel("Normal");
+                        result[1].setColor(ChartUtils.COLOR_GREEN);
+                        result[2].setValue(counter[2]);
+                        result[2].setLabel("High");
+                        result[2].setColor(ChartUtils.COLOR_VIOLET);
                     }
 
                     @Override
                     public void displayResult() {
-
+                        PiePanelFragment panel = (PiePanelFragment) getPanel();
+                        panel.clear();
+                        PiePanelFragment.PieStyle style = new PiePanelFragment.PieStyle();
+                        style.has_label = true;
+                        style.has_label_outside = false;
+                        panel.setStyle(style);
+                        panel.appendSlices(result);
                     }
                 },
                 new TypedHistoryMode() {
+                    private SliceValue[] result = new SliceValue[]{
+                            new SliceValue(),
+                            new SliceValue(),
+                            new SliceValue()
+                    };
+
                     @Override
                     public String getModeTitle() {
                         return modes_title[MODE_SLEEP];
@@ -166,14 +234,38 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
                     @Override
                     public void analyseData(EventData[] data, int analyse_rate) {
 
+                        int[] counter = new int[]{0, 0, 0};
+                        for (int i = 0; i < data.length; ++i) {
+                            if (data[i].spo2h > 95) {
+                                counter[2]++;
+                            } else if (data[i].spo2h > 85) {
+                                counter[1]++;
+                            } else {
+                                counter[0]++;
+                            }
+                        }
+                        result[0].setValue(counter[0]);
+                        result[0].setLabel("Low");
+                        result[0].setColor(ChartUtils.COLOR_RED);
+                        result[1].setValue(counter[1]);
+                        result[1].setLabel("Normal");
+                        result[1].setColor(ChartUtils.COLOR_GREEN);
+                        result[2].setValue(counter[2]);
+                        result[2].setLabel("High");
+                        result[2].setColor(ChartUtils.COLOR_VIOLET);
                     }
 
                     @Override
                     public void displayResult() {
-
+                        PiePanelFragment panel = (PiePanelFragment) getPanel();
+                        panel.clear();
+                        PiePanelFragment.PieStyle style = new PiePanelFragment.PieStyle();
+                        style.has_label = true;
+                        style.has_label_outside = false;
+                        panel.setStyle(style);
+                        panel.appendSlices(result);
                     }
                 },
-
         };
     }
 
@@ -214,24 +306,15 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
     }
 
     @Override
-    public void deleteEvent() {
-
+    public void deleteEvent(long event_id) {
+        mDataManager.deleteEvent(event_id);
     }
 
-    private class AnalyseTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
+    /**
+     * Created by presisco on 2017/4/27.
+     */
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
+    public abstract static class TypedHistoryMode extends HistoryMode<EventData> {
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            return null;
-        }
     }
 }

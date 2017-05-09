@@ -11,5 +11,4 @@ public abstract class ChartPanelFragment extends MonitorPanelFragment {
     public abstract void appendValue(float value);
 
     protected abstract void initChart();
-
 }

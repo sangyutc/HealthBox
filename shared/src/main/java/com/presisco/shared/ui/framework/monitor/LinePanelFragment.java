@@ -83,7 +83,7 @@ public class LinePanelFragment extends ChartPanelFragment {
         mAxisXBaseline = baseline;
     }
 
-    public void setLineStyle(LineStyle lineStyle) {
+    public void setStyle(LineStyle lineStyle) {
         mLineStyle = lineStyle;
     }
 
@@ -153,8 +153,7 @@ public class LinePanelFragment extends ChartPanelFragment {
     public void clear() {
         mPoints.clear();
         mLastXCoord = mAxisXBaseline;
-        initChart();
-        resetViewport();
+        redraw();
     }
 
     @Override

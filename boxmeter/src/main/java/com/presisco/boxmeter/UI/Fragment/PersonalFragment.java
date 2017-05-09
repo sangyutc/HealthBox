@@ -1,6 +1,7 @@
 package com.presisco.boxmeter.UI.Fragment;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -8,18 +9,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.presisco.boxmeter.R;
 import com.presisco.boxmeter.Service.BTService;
 import com.presisco.boxmeter.UI.Activity.BTBoxActivity;
+import com.presisco.boxmeter.UI.Activity.DBDebugActivity;
 import com.presisco.boxmeter.UI.Activity.SurveyActivity;
+import com.presisco.boxmeter.constant.Constant;
+import com.presisco.shared.ui.fragment.BasePersonalFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link PersonalFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PersonalFragment extends Fragment {
+public class PersonalFragment extends BasePersonalFragment implements BasePersonalFragment.ActionListener {
     private static final int REQUEST_ID_SIGN_UP = 1;
+
+    private boolean isLoggedIn = false;
+    private String username = "";
 
     public PersonalFragment() {
         // Required empty public constructor
@@ -33,38 +39,52 @@ public class PersonalFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!isLoggedIn) {
+            SharedPreferences preferences = getActivity().getSharedPreferences(Constant.SHARED_PREFERENCE_NAME, 0);
+            isLoggedIn = preferences.getBoolean(Constant.SHARED_PREF_KEY_IS_LOGGED_IN, false);
+        }
+        setChildListener(this);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_personal, container, false);
-        rootView.findViewById(R.id.buttonToolbox).setOnClickListener(new BTToolboxBtnListener());
-        rootView.findViewById(R.id.buttonReconnect).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(BTService.ACTION_TARGET_CONNECT));
-            }
-        });
-        rootView.findViewById(R.id.buttonSignUp).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(getActivity(), SurveyActivity.class), REQUEST_ID_SIGN_UP);
-            }
-        });
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = super.onCreateView(inflater, container, savedInstanceState);
+        if (isLoggedIn) {
+            showUsername();
+            setUsername(Constant.SHARED_PREF_KEY_USERNAME);
+        } else {
+            showLogin();
+        }
         return rootView;
     }
 
-    private class BTToolboxBtnListener implements View.OnClickListener {
-        /**
-         * Called when a view has been clicked.
-         *
-         * @param v The view that was clicked.
-         */
-        @Override
-        public void onClick(View v) {
-            startActivity(new Intent(getActivity(), BTBoxActivity.class));
-        }
+    @Override
+    public void onLogin() {
+
+    }
+
+    @Override
+    public void onSignUp() {
+        startActivityForResult(new Intent(getActivity(), SurveyActivity.class), REQUEST_ID_SIGN_UP);
+    }
+
+    @Override
+    public void onBTBox() {
+        startActivity(new Intent(getActivity(), BTBoxActivity.class));
+    }
+
+    @Override
+    public void onInstantUpload() {
+
+    }
+
+    @Override
+    public void onBTReconnect() {
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(BTService.ACTION_TARGET_CONNECT));
+    }
+
+    @Override
+    public void onDBDebug() {
+        startActivity(new Intent(getActivity(), DBDebugActivity.class));
     }
 }
