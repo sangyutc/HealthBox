@@ -19,7 +19,6 @@ public abstract class BasePersonalFragment extends Fragment {
     private LinearLayout mUserLayout;
     private LinearLayout mLoginLayout;
     private TextView mUsernameText;
-
     public BasePersonalFragment() {
         // Required empty public constructor
     }
@@ -86,6 +85,12 @@ public abstract class BasePersonalFragment extends Fragment {
                 mChildListener.onDBDebug();
             }
         });
+        rootView.findViewById(R.id.buttonMonitorSetting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mChildListener.onMonitorSetting();
+            }
+        });
         return rootView;
     }
 
@@ -101,6 +106,8 @@ public abstract class BasePersonalFragment extends Fragment {
         void onBTReconnect();
 
         void onDBDebug();
+
+        void onMonitorSetting();
     }
 
 }

@@ -1,11 +1,13 @@
 package com.example.heartmeter.UI.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.example.heartmeter.Data.Event;
 import com.example.heartmeter.Data.EventData;
 import com.example.heartmeter.R;
+import com.example.heartmeter.UI.Activity.CommentActivity;
 import com.example.heartmeter.storage.SQLiteManager;
 import com.presisco.shared.data.BaseEvent;
 import com.presisco.shared.data.BaseEventData;
@@ -303,6 +305,11 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
     @Override
     public void deleteEvent(long event_id) {
         mDataManager.deleteEvent(event_id);
+    }
+
+    @Override
+    public void comment() {
+        startActivity(new Intent(getActivity(), CommentActivity.class));
     }
 
     /**

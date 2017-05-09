@@ -17,6 +17,7 @@
     <string name="label_signup">注册</string>
     <string name="text_wrong_password">密码不正确</string>
     <string name="label_delete">删除</string>
+    <string name="label_comment">评价你的感受</string>
 
     <string-array name="title_warning_bt">
         <item>警告：</item>

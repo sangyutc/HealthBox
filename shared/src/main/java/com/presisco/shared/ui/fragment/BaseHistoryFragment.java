@@ -40,10 +40,8 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
     private BaseEvent[] mEvents = null;
     private BaseEvent mCurrentEvent = null;
     private ArrayList<String> mEventTitles = new ArrayList<>();
-
     private ProgressDialog mAnalyseProgress;
     private Executor mAnalyseExecutor = Executors.newSingleThreadExecutor();
-
     public BaseHistoryFragment() {
         // Required empty public constructor
     }
@@ -134,6 +132,13 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
         mAnalyseProgress.setIndeterminate(true);
         mAnalyseProgress.setTitle("正在进行分析");
 
+        rootView.findViewById(R.id.buttonComment).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mChildListener.comment();
+            }
+        });
+
         return rootView;
     }
 
@@ -154,6 +159,8 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
         BaseEventData[] loadEventData(long event_id);
 
         void deleteEvent(long event_id);
+
+        void comment();
     }
 
     private class EventAdapter extends ArrayAdapter<String> {

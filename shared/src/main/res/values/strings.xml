@@ -14,4 +14,17 @@
     <string name="label_comment">评价</string>
     <string name="label_instant_upload">立刻上传</string>
     <string name="label_reconnect_bt">重新连接蓝牙设备</string>
+    <string name="label_setup_monitor">设置监视选项</string>
+    <string name="label_emergency_number">紧急号码</string>
+    <string name="label_emergency_ringtong">紧急提示音</string>
+    <string name="label_emergency_vibe">紧急震动</string>
+    <string name="label_emergency_sound">紧急提示音</string>
+    <string name="text_emergency_number">出现紧急状况时通知的号码</string>
+    <string name="label_vibe">震动</string>
+    <string name="label_vibe_on">开启震动</string>
+    <string name="label_vibe_off">关闭震动</string>
+    <string name="label_sound">提示音</string>
+    <string name="label_sound_on">开启提示音</string>
+    <string name="label_sound_off">关闭提示音</string>
+    <string name="text_ringtone">出现紧急状况时的提示音</string>
 </resources>

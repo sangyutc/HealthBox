@@ -1,7 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/PanelRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:divider="@drawable/linear_layout_divider"
+    android:orientation="vertical"
+    android:showDividers="middle">
 
     <LinearLayout
         android:id="@+id/userLayout"
@@ -27,10 +30,13 @@
         android:id="@+id/loginLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:divider="@drawable/linear_layout_divider"
+        android:orientation="horizontal"
+        android:showDividers="middle">
 
         <Button
             android:id="@+id/buttonLogin"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -38,6 +44,7 @@
 
         <Button
             android:id="@+id/buttonSignUp"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -46,25 +53,36 @@
 
     <Button
         android:id="@+id/buttonInstantUpload"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/label_instant_upload" />
 
     <Button
         android:id="@+id/buttonDBDebug"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="本地数据测试" />
 
     <Button
         android:id="@+id/buttonBTToolbox"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Bluetooth Toolbox" />
 
     <Button
         android:id="@+id/buttonBTReconnect"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/label_reconnect_bt" />
+
+    <Button
+        android:id="@+id/buttonMonitorSetting"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/label_setup_monitor" />
 </LinearLayout>

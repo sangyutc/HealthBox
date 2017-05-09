@@ -3,6 +3,7 @@ package com.example.heartmeter.UI.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
@@ -40,7 +41,7 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!isLoggedIn) {
-            SharedPreferences preferences = getActivity().getSharedPreferences(Constant.SHARED_PREFERENCE_NAME, 0);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             isLoggedIn = preferences.getBoolean(Constant.SHARED_PREF_KEY_IS_LOGGED_IN, false);
         }
         setChildListener(this);
@@ -86,5 +87,10 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
     @Override
     public void onDBDebug() {
         startActivity(new Intent(getActivity(), DBDebugActivity.class));
+    }
+
+    @Override
+    public void onMonitorSetting() {
+
     }
 }

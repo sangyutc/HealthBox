@@ -1,11 +1,13 @@
 package com.presisco.boxmeter.UI.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.presisco.boxmeter.Data.Event;
 import com.presisco.boxmeter.Data.EventData;
 import com.presisco.boxmeter.R;
+import com.presisco.boxmeter.UI.Activity.CommentActivity;
 import com.presisco.boxmeter.storage.SQLiteManager;
 import com.presisco.shared.data.BaseEvent;
 import com.presisco.shared.data.BaseEventData;
@@ -308,6 +310,11 @@ public class HistoryFragment extends BaseHistoryFragment implements BaseHistoryF
     @Override
     public void deleteEvent(long event_id) {
         mDataManager.deleteEvent(event_id);
+    }
+
+    @Override
+    public void comment() {
+        startActivity(new Intent(getActivity(), CommentActivity.class));
     }
 
     /**

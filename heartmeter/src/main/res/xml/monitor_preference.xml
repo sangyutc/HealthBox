@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:key="preference_emergency_number"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/text_emergency_number"
+        android:title="@string/label_emergency_number" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="preference_use_vibration"
+        android:summaryOff="@string/label_vibe_off"
+        android:summaryOn="@string/label_vibe_on"
+        android:title="@string/label_vibe" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="preference_use_sound"
+        android:summaryOff="@string/label_sound_off"
+        android:summaryOn="@string/label_sound_on"
+        android:title="@string/label_sound" />
+    <RingtonePreference
+        android:dependency="preference_use_sound"
+        android:key="preference_ringtone"
+        android:ringtoneType="ringtone|notification"
+        android:summary="@string/text_ringtone"
+        android:title="@string/label_emergency_ringtong" />
+</PreferenceScreen>

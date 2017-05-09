@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -32,7 +34,11 @@
             android:exported="true" />
 
         <activity android:name=".UI.Activity.SurveyActivity" />
-        <activity android:name=".UI.Activity.DBDebugActivity"></activity>
+        <activity android:name=".UI.Activity.DBDebugActivity" />
+        <activity android:name=".UI.Activity.MonitorPreferenceActivity" />
+        <activity
+            android:name=".UI.Activity.CommentActivity"
+            android:theme="@style/AppTheme.Dialog" />
     </application>
 
 </manifest>
