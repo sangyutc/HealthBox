@@ -91,6 +91,12 @@ public abstract class BasePersonalFragment extends Fragment {
                 mChildListener.onMonitorSetting();
             }
         });
+        rootView.findViewById(R.id.buttonMonitorDebug).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mChildListener.onMonitorDebug();
+            }
+        });
         return rootView;
     }
 
@@ -108,6 +114,8 @@ public abstract class BasePersonalFragment extends Fragment {
         void onDBDebug();
 
         void onMonitorSetting();
+
+        void onMonitorDebug();
     }
 
 }

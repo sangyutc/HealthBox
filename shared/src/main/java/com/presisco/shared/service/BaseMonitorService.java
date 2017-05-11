@@ -44,8 +44,7 @@ public abstract class BaseMonitorService extends Service {
     }
 
     protected void scream(Uri uri_ringtone) {
-        int cursor_pos = mRingtoneManager.getRingtonePosition(uri_ringtone);
-        Ringtone ringtone = mRingtoneManager.getRingtone(cursor_pos);
+        Ringtone ringtone = RingtoneManager.getRingtone(this, uri_ringtone);
         ringtone.play();
     }
 

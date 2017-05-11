@@ -11,10 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.heartmeter.Service.BTService;
-import com.example.heartmeter.UI.Activity.BTBoxActivity;
-import com.example.heartmeter.UI.Activity.DBDebugActivity;
+import com.example.heartmeter.UI.Activity.MonitorPreferenceActivity;
 import com.example.heartmeter.UI.Activity.SurveyActivity;
 import com.example.heartmeter.constant.Constant;
+import com.example.heartmeter.debug.BTBoxActivity;
+import com.example.heartmeter.debug.DBDebugActivity;
 import com.presisco.shared.ui.fragment.BasePersonalFragment;
 
 /**
@@ -91,6 +92,11 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
 
     @Override
     public void onMonitorSetting() {
+        startActivity(new Intent(getActivity(), MonitorPreferenceActivity.class));
+    }
+
+    @Override
+    public void onMonitorDebug() {
 
     }
 }

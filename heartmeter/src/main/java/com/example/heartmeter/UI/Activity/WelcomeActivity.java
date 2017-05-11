@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.example.heartmeter.R;
 import com.example.heartmeter.Service.HubService;
+import com.example.heartmeter.Service.MonitorService;
 
 import java.util.concurrent.Executors;
 
@@ -30,6 +31,7 @@ public class WelcomeActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             startService(new Intent(WelcomeActivity.this, HubService.class));
+            startService(new Intent(WelcomeActivity.this, MonitorService.class));
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {

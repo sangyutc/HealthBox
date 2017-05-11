@@ -31,10 +31,14 @@
             android:name=".Service.HubService"
             android:enabled="true"
             android:exported="true" />
+        <service
+            android:name=".Service.MonitorService"
+            android:enabled="true"
+            android:exported="true" />
 
-        <activity android:name=".UI.Activity.BTBoxActivity" />
+        <activity android:name=".debug.BTBoxActivity" />
         <activity android:name=".UI.Activity.SurveyActivity" />
-        <activity android:name=".UI.Activity.DBDebugActivity"></activity>
+        <activity android:name=".debug.DBDebugActivity"></activity>
     </application>
 
 </manifest>

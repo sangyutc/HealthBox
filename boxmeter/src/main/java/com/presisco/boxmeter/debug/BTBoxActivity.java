@@ -1,4 +1,4 @@
-package com.presisco.boxmeter.UI.Activity;
+package com.presisco.boxmeter.debug;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

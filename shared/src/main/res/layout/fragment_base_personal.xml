@@ -11,7 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingBottom="12dp"
+        android:paddingTop="12dp">
 
         <TextView
             android:id="@+id/textView3"
@@ -23,6 +25,7 @@
             android:id="@+id/textUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
             android:text="TextView" />
     </LinearLayout>
 
@@ -85,4 +88,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/label_setup_monitor" />
+
+    <Button
+        android:id="@+id/buttonMonitorDebug"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="测试监视功能" />
 </LinearLayout>

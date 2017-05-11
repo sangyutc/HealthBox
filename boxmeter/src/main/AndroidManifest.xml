@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -15,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".UI.Activity.MainActivity" />
-        <activity android:name=".UI.Activity.BTBoxActivity" />
+        <activity android:name=".debug.BTBoxActivity" />
         <activity android:name=".UI.Activity.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,13 +33,19 @@
             android:name=".Service.HubService"
             android:enabled="true"
             android:exported="true" />
+        <service
+            android:name=".Service.MonitorService"
+            android:enabled="true"
+            android:exported="true" />
 
         <activity android:name=".UI.Activity.SurveyActivity" />
-        <activity android:name=".UI.Activity.DBDebugActivity" />
+        <activity android:name=".debug.DBDebugActivity" />
         <activity android:name=".UI.Activity.MonitorPreferenceActivity" />
         <activity
             android:name=".UI.Activity.CommentActivity"
             android:theme="@style/AppTheme.Dialog" />
+        <activity android:name=".debug.MonitorDebugActivity" />
+        <activity android:name=".debug.NetTaskDebugActivity"></activity>
     </application>
 
 </manifest>

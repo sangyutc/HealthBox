@@ -1,4 +1,4 @@
-package com.example.heartmeter.UI.Activity;
+package com.example.heartmeter.debug;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;

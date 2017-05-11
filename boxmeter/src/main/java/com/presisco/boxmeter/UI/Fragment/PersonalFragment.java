@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.presisco.boxmeter.Service.BTService;
-import com.presisco.boxmeter.UI.Activity.BTBoxActivity;
-import com.presisco.boxmeter.UI.Activity.DBDebugActivity;
+import com.presisco.boxmeter.UI.Activity.MonitorPreferenceActivity;
 import com.presisco.boxmeter.UI.Activity.SurveyActivity;
 import com.presisco.boxmeter.constant.Constant;
+import com.presisco.boxmeter.debug.BTBoxActivity;
+import com.presisco.boxmeter.debug.DBDebugActivity;
+import com.presisco.boxmeter.debug.MonitorDebugActivity;
 import com.presisco.shared.ui.fragment.BasePersonalFragment;
 
 /**
@@ -91,6 +93,11 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
 
     @Override
     public void onMonitorSetting() {
+        startActivity(new Intent(getActivity(), MonitorPreferenceActivity.class));
+    }
 
+    @Override
+    public void onMonitorDebug() {
+        startActivity(new Intent(getActivity(), MonitorDebugActivity.class));
     }
 }
