@@ -45,6 +45,8 @@ public abstract class HealthDataManager<EVENT, EVENT_DATA> {
 
     public abstract void deleteEvent(long event_id);
 
+    public abstract EVENT[] getEventsAfter(long event_id);
+
     protected SQLiteDatabase getDatabase(int mode) {
         if (mode == READ_DATABASE) {
             return mDBOpener.getReadableDatabase();

@@ -5,34 +5,46 @@ package com.presisco.shared.data;
  */
 
 public class EventSummary {
-    private String date;
-    private String type;
-    private int duration;
-    private int averageStats;
-    private String evaluation;
+    public String username;
+    public String body_sign;
+    public String date;
+    public String event_type;
+    public int duration;
+    public int average_stats;
+    public String evaluation;
 
-    public EventSummary(String _date, String _type, int _duration, int _average_stats, String _evaluation) {
+    public EventSummary() {
+
+    }
+
+    public EventSummary(String _username, String _body_sign, String _date, String _type, int _duration, int _average_stats, String _evaluation) {
+        username = _username;
+        body_sign = _body_sign;
         date = _date;
-        type = _type;
+        event_type = _type;
         duration = _duration;
-        averageStats = _average_stats;
+        average_stats = _average_stats;
         evaluation = _evaluation;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public String getDate() {
         return date;
     }
 
-    public String getType() {
-        return type;
+    public String getEvent_type() {
+        return event_type;
     }
 
     public int getDuration() {
         return duration;
     }
 
-    public int getAverageStats() {
-        return averageStats;
+    public int getAverage_stats() {
+        return average_stats;
     }
 
     public String getEvaluation() {

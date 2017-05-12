@@ -15,7 +15,7 @@ import com.presisco.shared.service.BaseMonitorService;
  * Created by presisco on 2017/5/9.
  */
 
-public class MonitorService extends BaseMonitorService {
+public class MonitorService extends BaseMonitorService implements SharedPreferences.OnSharedPreferenceChangeListener {
     private boolean use_vibrator;
     private boolean use_ringtone;
     private Uri uri_ringtone;
@@ -25,6 +25,7 @@ public class MonitorService extends BaseMonitorService {
     public void onCreate() {
         super.onCreate();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences.registerOnSharedPreferenceChangeListener(this);
         use_vibrator = preferences.getBoolean("preference_use_vibration", true);
         use_ringtone = preferences.getBoolean("preference_use_sound", true);
         if (use_ringtone) {
@@ -34,6 +35,35 @@ public class MonitorService extends BaseMonitorService {
         }
         emergency_number = preferences.getString("preference_emergency_number", "120");
         getLocalBroadcastManager().registerReceiver(new SignsReceiver(), new IntentFilter(HubService.ACTION_HEART_RATE_REDUCED));
+    }
+
+    /**
+     * Called when a shared preference is changed, added, or removed. This
+     * may be called even if a preference is set to its existing value.
+     * <p>
+     * <p>This callback will be run on your main thread.
+     *
+     * @param sharedPreferences The {@link SharedPreferences} that received
+     *                          the change.
+     * @param key               The key of the preference that was changed, added, or
+     */
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        switch (key) {
+            case "preference_use_vibration":
+                use_vibrator = sharedPreferences.getBoolean(key, true);
+                break;
+            case "preference_use_sound":
+                use_ringtone = sharedPreferences.getBoolean(key, true);
+                break;
+            case "preference_ringtone":
+                uri_ringtone = Uri.parse(sharedPreferences.getString(key,
+                        RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE)
+                                .toString()));
+            case "preference_emergency_number":
+                emergency_number = sharedPreferences.getString("preference_emergency_number", "120");
+                break;
+        }
     }
 
     private class SignsReceiver extends BroadcastReceiver {
@@ -53,13 +83,7 @@ public class MonitorService extends BaseMonitorService {
                 if (use_ringtone) {
                     scream(uri_ringtone);
                 }
-                Intent call_intent = new Intent(Intent.ACTION_CALL);
-                call_intent.setData(Uri.parse("tel:" + emergency_number));
-                try {
-                    startActivity(call_intent);
-                } catch (SecurityException e) {
-                    e.printStackTrace();
-                }
+                call(emergency_number);
                 emergency_counter = 0;
             }
         }

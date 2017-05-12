@@ -1,91 +1,138 @@
 package com.presisco.shared.service;
 
-import android.app.IntentService;
-import android.content.Context;
+import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
-public class BaseUploadService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "com.presisco.boxmeter.Service.action.FOO";
-    private static final String ACTION_BAZ = "com.presisco.boxmeter.Service.action.BAZ";
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
+import com.presisco.shared.data.BaseEvent;
+import com.presisco.shared.data.BaseEventData;
+import com.presisco.shared.data.EventSummary;
+import com.presisco.shared.network.request.UploadEventsRequest;
+import com.presisco.shared.utils.LCAT;
 
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.presisco.boxmeter.Service.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.presisco.boxmeter.Service.extra.PARAM2";
-
+public abstract class BaseUploadService extends Service implements Response.Listener<String>, Response.ErrorListener {
+    private static final String ACTION_UPLOAD_EVENTS = "com.presisco.shared.service.action.UPLOAD_EVENTS";
+    private AnalyzeStuffListener mAnalyzeStuffListener;
+    private long event_baseline_id;
     public BaseUploadService() {
-        super("BaseUploadService");
+
     }
 
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionFoo(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, BaseUploadService.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
-
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, BaseUploadService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
+    protected void setAnalyzeTaskListener(AnalyzeStuffListener listener) {
+        mAnalyzeStuffListener = listener;
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
-            }
+    public abstract void onCreate();
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    /**
+     * 开始分析与上传任务
+     */
+    protected void startTask() {
+        event_baseline_id = mAnalyzeStuffListener.loadBaselineID();
+        new AnalyzeTask().execute(event_baseline_id);
+    }
+
+    private void startUpload(EventSummary[] summaries) {
+        UploadEventsRequest request = new UploadEventsRequest(summaries, this, this);
+        Volley.newRequestQueue(this).add(request);
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        LCAT.d(this, error.getMessage());
+        stopSelf();
+    }
+
+    @Override
+    public void onResponse(String response) {
+        if (!response.equals("succeed")) {
+            LCAT.d(this, response);
+        } else {
+            mAnalyzeStuffListener.updateBaselineID(event_baseline_id);
         }
+        stopSelf();
     }
 
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionFoo(String param1, String param2) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
+    public interface AnalyzeStuffListener<EVENT, EVENT_DATA> {
+
+        /**
+         * 读取要分析的第一个活动的id
+         *
+         * @return
+         */
+        long loadBaselineID();
+
+        /**
+         * 读取活动列表
+         *
+         * @param baseline_id 要分析的活动的id
+         * @return 活动列表
+         */
+        EVENT[] loadEvents(long baseline_id);
+
+        /**
+         * 读取活动数据
+         *
+         * @param event_id 要分析的活动的id
+         * @return 活动数据
+         */
+        EVENT_DATA[] loadEventData(long event_id);
+
+        /**
+         * 对数据进行分析
+         *
+         * @param event          活动信息
+         * @param event_data_set 活动数据
+         * @return 活动总结
+         */
+        EventSummary analyze(EVENT event, EVENT_DATA[] event_data_set);
+
+        /**
+         * 更新要分析的活动的id
+         *
+         * @param new_id 新的baseline id
+         */
+        void updateBaselineID(long new_id);
     }
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+    private class AnalyzeTask extends AsyncTask<Long, Void, EventSummary[]> {
+        @Override
+        protected void onPostExecute(EventSummary[] summaries) {
+            event_baseline_id += summaries.length;
+            startUpload(summaries);
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected EventSummary[] doInBackground(Long... params) {
+            BaseEvent[] events = (BaseEvent[]) mAnalyzeStuffListener.loadEvents(params[0]);
+            EventSummary[] summaries = new EventSummary[events.length];
+            for (int i = 0; i < events.length; ++i) {
+                BaseEventData[] eventDataSet = (BaseEventData[]) mAnalyzeStuffListener.loadEventData(events[i].id);
+                summaries[i] = mAnalyzeStuffListener.analyze(events[i], eventDataSet);
+            }
+            return summaries;
+        }
     }
 }

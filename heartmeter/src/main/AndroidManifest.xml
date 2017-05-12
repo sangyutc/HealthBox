@@ -35,10 +35,21 @@
             android:name=".Service.MonitorService"
             android:enabled="true"
             android:exported="true" />
+        <service
+            android:name=".Service.UploadService"
+            android:enabled="true"
+            android:exported="true" />
 
         <activity android:name=".debug.BTBoxActivity" />
+        <activity android:name=".debug.DBDebugActivity" />
+        <activity android:name=".debug.NetTaskDebugActivity" />
         <activity android:name=".UI.Activity.SurveyActivity" />
-        <activity android:name=".debug.DBDebugActivity"></activity>
+        <activity
+            android:name=".UI.Activity.CommentActivity"
+            android:theme="@style/AppTheme.Dialog" />
+        <activity
+            android:name=".UI.Activity.SignInActivity"
+            android:theme="@style/AppTheme.Dialog" />
     </application>
 
 </manifest>

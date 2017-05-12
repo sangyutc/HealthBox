@@ -12,11 +12,12 @@ import android.view.ViewGroup;
 
 import com.presisco.boxmeter.Service.BTService;
 import com.presisco.boxmeter.UI.Activity.MonitorPreferenceActivity;
+import com.presisco.boxmeter.UI.Activity.SignInActivity;
 import com.presisco.boxmeter.UI.Activity.SurveyActivity;
-import com.presisco.boxmeter.constant.Constant;
 import com.presisco.boxmeter.debug.BTBoxActivity;
 import com.presisco.boxmeter.debug.DBDebugActivity;
 import com.presisco.boxmeter.debug.MonitorDebugActivity;
+import com.presisco.boxmeter.debug.NetTaskDebugActivity;
 import com.presisco.shared.ui.fragment.BasePersonalFragment;
 
 /**
@@ -26,9 +27,9 @@ import com.presisco.shared.ui.fragment.BasePersonalFragment;
  */
 public class PersonalFragment extends BasePersonalFragment implements BasePersonalFragment.ActionListener {
     private static final int REQUEST_ID_SIGN_UP = 1;
+    private static final int REQUEST_ID_LOGIN = 2;
 
-    private boolean isLoggedIn = false;
-    private String username = "";
+    private SharedPreferences mPreferences;
 
     public PersonalFragment() {
         // Required empty public constructor
@@ -42,19 +43,17 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!isLoggedIn) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            isLoggedIn = preferences.getBoolean(Constant.SHARED_PREF_KEY_IS_LOGGED_IN, false);
-        }
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         setChildListener(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
-        if (isLoggedIn) {
+        String username = mPreferences.getString("username", "");
+        if (username != "") {
             showUsername();
-            setUsername(Constant.SHARED_PREF_KEY_USERNAME);
+            setUsername(username);
         } else {
             showLogin();
         }
@@ -62,13 +61,19 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
     }
 
     @Override
-    public void onLogin() {
-
+    public void onSignIn() {
+        startActivityForResult(new Intent(getActivity(), SignInActivity.class), REQUEST_ID_LOGIN);
     }
 
     @Override
     public void onSignUp() {
         startActivityForResult(new Intent(getActivity(), SurveyActivity.class), REQUEST_ID_SIGN_UP);
+    }
+
+    @Override
+    public void onSignOut() {
+        mPreferences.edit().putString("username", "").commit();
+        showLogin();
     }
 
     @Override
@@ -78,7 +83,7 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
 
     @Override
     public void onInstantUpload() {
-
+        startActivity(new Intent(getActivity(), NetTaskDebugActivity.class));
     }
 
     @Override
@@ -99,5 +104,28 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
     @Override
     public void onMonitorDebug() {
         startActivity(new Intent(getActivity(), MonitorDebugActivity.class));
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ID_SIGN_UP:
+                if (resultCode == SurveyActivity.RESULT_PASSED) {
+                    String username = data.getStringExtra("username");
+                    mPreferences.edit().putString("username", username).commit();
+                    showUsername();
+                    setUsername(username);
+                }
+                break;
+            case REQUEST_ID_LOGIN:
+                if (resultCode == SignInActivity.RESULT_PASSED) {
+                    String username = data.getStringExtra("username");
+                    mPreferences.edit().putString("username", username).commit();
+                    showUsername();
+                    setUsername(username);
+                }
+                break;
+        }
     }
 }

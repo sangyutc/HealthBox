@@ -48,6 +48,16 @@ public abstract class BaseMonitorService extends Service {
         ringtone.play();
     }
 
+    protected void call(String number) {
+        Intent call_intent = new Intent(Intent.ACTION_CALL);
+        call_intent.setData(Uri.parse("tel:" + number));
+        try {
+            startActivity(call_intent);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onDestroy() {
 

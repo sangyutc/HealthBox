@@ -1,5 +1,6 @@
 package com.example.heartmeter.UI.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -7,7 +8,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 import com.example.heartmeter.R;
+import com.presisco.shared.network.request.SignUpRequest;
+
+import java.util.HashMap;
 
 /**
  * 用户注册及调查窗口
@@ -31,6 +39,8 @@ public class SurveyActivity extends AppCompatActivity {
     private Spinner mUsageFrequencySpinner;
     private Spinner mTrustSpinnerSpinner;
     private Spinner mChannelSpinner;
+
+    private RequestQueue mRequestQueue;
 
     /**
      * 获取文字编辑控件的引用
@@ -77,6 +87,7 @@ public class SurveyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_survey);
         linkViews();
         setResult(RESULT_CANCELED);
+        mRequestQueue = Volley.newRequestQueue(this);
     }
 
     /**
@@ -120,20 +131,40 @@ public class SurveyActivity extends AppCompatActivity {
             return;
         }
 
-        String[] data = new String[]{
-                getValue(mNameEdit),
-                getValue(mPasswordEdit),
-                getValue(mAgeSpinner),
-                getValue(mGenderSpinner),
-                getValue(mPoliticalStatusSpinner),
-                getValue(mEducationStatusSpinner),
-                getValue(mCareerStatusSpinner),
-                getValue(mAnnualIncomeEdit),
-                getValue(mSocialStatusSpinner),
-                getValue(mUsageFrequencySpinner),
-                getValue(mTrustSpinnerSpinner),
-                getValue(mChannelSpinner)
-        };
+        HashMap<String, String> survey = new HashMap<>();
+        survey.put("username", getValue(mNameEdit));
+        survey.put("password", getValue(mPasswordEdit));
+        survey.put("age", getValue(mAgeSpinner));
+        survey.put("gender", getValue(mGenderSpinner));
+        survey.put("political_status", getValue(mPoliticalStatusSpinner));
+        survey.put("education_status", getValue(mEducationStatusSpinner));
+        survey.put("career_status", getValue(mCareerStatusSpinner));
+        survey.put("annual_income", getValue(mAnnualIncomeEdit));
+        survey.put("social_status", getValue(mSocialStatusSpinner));
+        survey.put("usage_frequency", getValue(mUsageFrequencySpinner));
+        survey.put("trust", getValue(mTrustSpinnerSpinner));
+        survey.put("channel", getValue(mChannelSpinner));
 
+        SignUpRequest request = new SignUpRequest(survey
+                , new Response.Listener<String>() {
+            /**
+             * Called when a response is received.
+             *
+             * @param response
+             */
+            @Override
+            public void onResponse(String response) {
+                Toast.makeText(SurveyActivity.this, response, Toast.LENGTH_SHORT).show();
+                SurveyActivity.this.setResult(RESULT_PASSED, new Intent().putExtra("username", getValue(mNameEdit)));
+                SurveyActivity.this.finish();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(SurveyActivity.this, "sign up failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mRequestQueue.add(request);
     }
 }

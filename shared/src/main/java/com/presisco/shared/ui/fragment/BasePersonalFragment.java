@@ -70,7 +70,13 @@ public abstract class BasePersonalFragment extends Fragment {
         rootView.findViewById(R.id.buttonLogin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mChildListener.onLogin();
+                mChildListener.onSignIn();
+            }
+        });
+        rootView.findViewById(R.id.buttonSignOut).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mChildListener.onSignOut();
             }
         });
         rootView.findViewById(R.id.buttonInstantUpload).setOnClickListener(new View.OnClickListener() {
@@ -101,9 +107,11 @@ public abstract class BasePersonalFragment extends Fragment {
     }
 
     public interface ActionListener {
-        void onLogin();
+        void onSignIn();
 
         void onSignUp();
+
+        void onSignOut();
 
         void onBTBox();
 

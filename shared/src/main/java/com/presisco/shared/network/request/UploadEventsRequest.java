@@ -3,15 +3,18 @@ package com.presisco.shared.network.request;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.presisco.shared.data.BaseEvent;
+import com.google.gson.Gson;
+import com.presisco.shared.data.EventSummary;
 import com.presisco.shared.network.Constant;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by presisco on 2017/5/11.
  */
 
 public class UploadEventsRequest extends StringRequest {
-    private BaseEvent[] events;
+    private EventSummary[] mEvents;
 
     /**
      * Creates a new GET request.
@@ -20,8 +23,9 @@ public class UploadEventsRequest extends StringRequest {
      * @param listener      Listener to receive the String response
      * @param errorListener Error listener, or null to ignore errors
      */
-    public UploadEventsRequest(BaseEvent[] events, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    public UploadEventsRequest(EventSummary[] events, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         super(null, listener, errorListener);
+        mEvents = events;
     }
 
     /**
@@ -59,7 +63,14 @@ public class UploadEventsRequest extends StringRequest {
      */
     @Override
     public byte[] getBody() throws AuthFailureError {
-
-        return super.getBody();
+        Gson gson = new Gson();
+        String converted_json = gson.toJson(mEvents);
+        byte[] raw = new byte[0];
+        try {
+            raw = converted_json.getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return raw;
     }
 }

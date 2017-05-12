@@ -1,5 +1,6 @@
 package com.presisco.boxmeter.UI.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -153,12 +154,14 @@ public class SurveyActivity extends AppCompatActivity {
              */
             @Override
             public void onResponse(String response) {
-                Toast.makeText(SurveyActivity.this, response, Toast.LENGTH_SHORT);
+                Toast.makeText(SurveyActivity.this, response, Toast.LENGTH_SHORT).show();
+                SurveyActivity.this.setResult(RESULT_PASSED, new Intent().putExtra("username", getValue(mNameEdit)));
+                SurveyActivity.this.finish();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(SurveyActivity.this, "sign up failed", Toast.LENGTH_SHORT);
+                Toast.makeText(SurveyActivity.this, "sign up failed", Toast.LENGTH_SHORT).show();
             }
         });
 
