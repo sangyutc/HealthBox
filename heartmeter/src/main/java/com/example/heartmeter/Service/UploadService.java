@@ -168,6 +168,7 @@ public class UploadService extends BaseUploadService
                 summary = analyzeSleep(event, event_data_set);
                 break;
         }
+        summary.body_sign = "heart_rate";
         return summary;
     }
 

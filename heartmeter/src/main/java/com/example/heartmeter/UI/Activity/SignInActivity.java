@@ -58,7 +58,7 @@ public class SignInActivity extends AppCompatActivity implements Response.Listen
      */
     @Override
     public void onResponse(String response) {
-        if (response.equals("failed")) {
+        if (response.contains("failed")) {
             Toast.makeText(this, "wrong password", Toast.LENGTH_SHORT).show();
         } else {
             Intent intent = new Intent();

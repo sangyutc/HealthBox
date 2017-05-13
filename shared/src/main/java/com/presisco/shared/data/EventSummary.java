@@ -27,6 +27,10 @@ public class EventSummary {
         evaluation = _evaluation;
     }
 
+    public String getBody_sign() {
+        return body_sign;
+    }
+
     public String getUsername() {
         return username;
     }

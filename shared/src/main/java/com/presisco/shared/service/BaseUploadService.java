@@ -56,15 +56,20 @@ public abstract class BaseUploadService extends Service implements Response.List
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        LCAT.d(this, error.getMessage());
+        if (error.getMessage() != null) {
+            LCAT.d(this, error.getMessage());
+        } else {
+            LCAT.d(this, "unknown failure");
+        }
         stopSelf();
     }
 
     @Override
     public void onResponse(String response) {
-        if (!response.equals("succeed")) {
+        if (!response.contains("succeed")) {
             LCAT.d(this, response);
         } else {
+            LCAT.d(this, "upload succeed");
             mAnalyzeStuffListener.updateBaselineID(event_baseline_id);
         }
         stopSelf();
