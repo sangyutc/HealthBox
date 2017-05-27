@@ -92,7 +92,7 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
     @Override
     public Event[] getEventsAfter(long event_id) {
         Cursor cursor = getDatabase(READ_DATABASE).query(
-                TABLE_EVENT, COLUMNS_EVENT, COLUMN_EVENT_ID + " >= ?", new String[]{event_id + ""}, null, null, null);
+                TABLE_EVENT, COLUMNS_EVENT, COLUMN_EVENT_ID + " >= " + event_id, null, null, null, null);
         return getEvents(cursor);
     }
 

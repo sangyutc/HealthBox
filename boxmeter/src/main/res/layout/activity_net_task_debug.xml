@@ -13,4 +13,12 @@
         android:layout_height="wrap_content"
         android:onClick="onUpload"
         android:text="发起上传操作" />
+
+    <Button
+        android:id="@+id/button"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onTest"
+        android:text="服务器测试" />
 </LinearLayout>

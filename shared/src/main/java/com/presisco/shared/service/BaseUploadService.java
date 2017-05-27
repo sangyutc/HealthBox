@@ -120,8 +120,10 @@ public abstract class BaseUploadService extends Service implements Response.List
     private class AnalyzeTask extends AsyncTask<Long, Void, EventSummary[]> {
         @Override
         protected void onPostExecute(EventSummary[] summaries) {
-            event_baseline_id += summaries.length;
-            startUpload(summaries);
+            if (summaries.length > 0) {
+                event_baseline_id += summaries.length;
+                startUpload(summaries);
+            }
         }
 
         @Override
