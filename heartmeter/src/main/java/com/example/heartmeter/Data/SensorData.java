@@ -5,7 +5,7 @@ import android.util.Log;
 import com.presisco.shared.utils.ByteUtils;
 
 /**
- * Created by presisco on 2017/4/12.
+ *
  */
 
 public class SensorData {
