@@ -51,6 +51,8 @@
         <activity
             android:name=".UI.Activity.SignInActivity"
             android:theme="@style/AppTheme.Dialog" />
+        <activity android:name=".UI.Activity.MonitorPreferenceActivity" />
+        <activity android:name=".debug.MonitorDebugActivity" />
     </application>
 
 </manifest>

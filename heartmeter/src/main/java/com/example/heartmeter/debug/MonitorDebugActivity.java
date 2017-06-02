@@ -39,7 +39,7 @@ public class MonitorDebugActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (mCurrentBeacon.getStatus() != AsyncTask.Status.FINISHED) {
+        if (mCurrentBeacon != null && mCurrentBeacon.getStatus() != AsyncTask.Status.FINISHED) {
             mCurrentBeacon.cancel(true);
         }
     }

@@ -118,15 +118,19 @@ public class HubService extends BaseHubService implements BaseBluetoothService.P
         if (probe_timeout < mAnalyseGroupSize / 5) {
             int cooked_spo2h = spo2h_sum / valid_spo2h_count;
             int cooked_pulse = pulse_sum / valid_pulse_count;
+
             broadcast(ACTION_SPO2H_VOLUME, cooked_spo2h);
             broadcast(ACTION_PULSE_VOLUME, pulse_volume);
             broadcast(ACTION_SPO2H, cooked_spo2h);
             broadcast(ACTION_PULSE, cooked_pulse);
+
             EventData data = new EventData();
             data.event_id = current_event_id;
             data.spo2h = cooked_spo2h;
             data.offset_time = analyse_group_counter;
+
             mDataManager.addDataToEvent(data);
+
             analyse_group_counter++;
         } else {
             sendNotification(ID_PROBE_TIMEOUT, R.drawable.ic_launcher, "探头超时", "确保探头已夹在手指上");
