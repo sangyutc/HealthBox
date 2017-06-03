@@ -11,14 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
-import com.presisco.shared.R;
+import com.presisco.shared.ui.framework.mode.RealTime;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
-import com.presisco.shared.ui.framework.realtime.RealTimeMode;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,13 +24,14 @@ import com.presisco.shared.ui.framework.realtime.RealTimeMode;
 public class BaseRealTimeFragment extends Fragment implements MonitorPanelFragment.ViewCreatedListener {
     private ActionListener mChildListener;
     private LocalBroadcastManager mLocalBroadcastManager;
+    private Spinner mEventTypeSpinner;
     private Spinner mModeSpinner;
     private MonitorHostFragment mMonitorHost;
     private MonitorPanelFragment mCurrentPanel;
     private Button mStartButton;
     private Button mStopButton;
-    private RealTimeMode[] mRealTimeModes = null;
-    private RealTimeMode mCurrentMode = null;
+    private RealTime[] mRealTimeModes = null;
+    private RealTime mCurrentMode = null;
     public BaseRealTimeFragment() {
         // Required empty public constructor
     }
@@ -41,16 +40,8 @@ public class BaseRealTimeFragment extends Fragment implements MonitorPanelFragme
         mChildListener = listener;
     }
 
-    protected void setRealTimeModes(RealTimeMode[] modes) {
+    protected void setRealTimeModes(RealTime[] modes) {
         mRealTimeModes = modes;
-    }
-
-    private String[] getTitles() {
-        String[] titles = new String[mRealTimeModes.length];
-        for (int i = 0; i < mRealTimeModes.length; ++i) {
-            titles[i] = mRealTimeModes[i].getModeTitle();
-        }
-        return titles;
     }
 
     @Override
@@ -60,21 +51,29 @@ public class BaseRealTimeFragment extends Fragment implements MonitorPanelFragme
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getContext());
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    protected View onCreateView(
+            int layout_id,
+            int type_spinner_id,
+            int display_spinner_id,
+            int monitor_host_id,
+            int start_btn_id,
+            int stop_btn_id,
+            LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View rootView = inflater.inflate(R.layout.fragment_base_real_time, container, false);
+        View rootView = inflater.inflate(layout_id, container, false);
         if (mMonitorHost == null) {
             mMonitorHost = MonitorHostFragment.newInstance();
         }
         mMonitorHost.setPanelViewCreatedListener(this);
         FragmentTransaction trans = getChildFragmentManager().beginTransaction();
-        trans.replace(R.id.monitorHost, mMonitorHost);
+        trans.replace(monitor_host_id, mMonitorHost);
         trans.commit();
 
-        mModeSpinner = (Spinner) rootView.findViewById(R.id.spinnerMode);
+        mEventTypeSpinner = (Spinner) rootView.findViewById(type_spinner_id);
+
+        mModeSpinner = (Spinner) rootView.findViewById(display_spinner_id);
         mModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
@@ -91,26 +90,29 @@ public class BaseRealTimeFragment extends Fragment implements MonitorPanelFragme
 
             }
         });
-        mModeSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getTitles()));
 
-        mStartButton = (Button) rootView.findViewById(R.id.buttonStart);
+        mStartButton = (Button) rootView.findViewById(start_btn_id);
         mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mChildListener.startEvent(mCurrentMode);
+                mEventTypeSpinner.setEnabled(false);
+                mChildListener.startEvent(mEventTypeSpinner.getSelectedItemPosition());
                 mStartButton.setEnabled(false);
                 mStopButton.setEnabled(true);
             }
         });
-        mStopButton = (Button) rootView.findViewById(R.id.buttonStop);
+
+        mStopButton = (Button) rootView.findViewById(stop_btn_id);
         mStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mChildListener.endEvent(mCurrentMode);
+                mEventTypeSpinner.setEnabled(true);
+                mChildListener.endEvent();
                 mStartButton.setEnabled(true);
                 mStopButton.setEnabled(false);
             }
         });
+        mStopButton.setEnabled(false);
         return rootView;
     }
 
@@ -122,13 +124,14 @@ public class BaseRealTimeFragment extends Fragment implements MonitorPanelFragme
         mCurrentMode.initPanelView();
     }
 
-    protected LocalBroadcastManager getLocalBroadcastmanager() {
+    protected LocalBroadcastManager getLocalBroadcastManager() {
         return mLocalBroadcastManager;
     }
 
     public interface ActionListener {
-        void startEvent(RealTimeMode mode);
+        void startEvent(int event_type_index);
 
-        void endEvent(RealTimeMode mode);
+        void endEvent();
     }
+
 }

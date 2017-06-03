@@ -3,10 +3,11 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_personal">个人</string>
-    <string name="title_realtime">实时状况</string>
+    <string name="title_real_time">实时状况</string>
     <string name="title_history">历史记录</string>
     <string name="label_monitor_mode">监控模式</string>
     <string name="label_history_mode">历史模式</string>
+    <string name="label_analyze_mode">分析模式</string>
     <string name="label_start">开始</string>
     <string name="label_stop">停止</string>
     <string name="label_username">用户名</string>
@@ -14,7 +15,7 @@
     <string name="label_repeat_password">重复输入一次密码</string>
     <string name="label_cancel">取消</string>
     <string name="label_apply">提交</string>
-    <string name="label_signup">注册</string>
+    <string name="label_sign_up">注册</string>
     <string name="text_wrong_password">密码不正确</string>
     <string name="label_delete">删除</string>
     <string name="label_comment">评价你的感受</string>
@@ -34,37 +35,24 @@
         <item>请重启设备</item>
     </string-array>
 
-    <string-array name="realtime_modes">
-        <item>常规-实时血氧</item>
-        <item>常规-实时脉率</item>
-        <item>常规-血氧曲线 1分钟</item>
-        <item>常规-脉率曲线 1分钟</item>
+    <string-array name="event_types">
+        <item>常规</item>
         <item>有氧运动</item>
         <item>无氧运动</item>
-        <item>睡眠</item>
+        <item>睡眠模式</item>
     </string-array>
 
-    <string-array name="realtime_mode_hints">
+    <string-array name="real_time_modes">
+        <item>实时血氧</item>
+        <item>实时脉率</item>
+        <item>血氧曲线 1分钟</item>
+        <item>脉率曲线 1分钟</item>
+    </string-array>
+
+    <string-array name="real_time_mode_hints">
         <item>显示实时血氧状况</item>
         <item>显示实时脉率状况</item>
         <item>显示一段时间内的血氧状况</item>
         <item>显示一段时间内的脉率状况</item>
-        <item>慢跑，游泳等</item>
-        <item>冲刺，球类运动等</item>
-        <item>睡眠参数检测</item>
-    </string-array>
-
-    <string-array name="history_modes">
-        <item>总览</item>
-        <item>有氧运动</item>
-        <item>无氧运动</item>
-        <item>睡眠</item>
-    </string-array>
-
-    <string-array name="history_mode_hints">
-        <item>常规记录</item>
-        <item>所有有氧运动记录</item>
-        <item>所有无氧运动记录</item>
-        <item>睡眠状态记录</item>
     </string-array>
 </resources>

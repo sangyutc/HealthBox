@@ -29,7 +29,7 @@ public class SurveyActivity extends AppCompatActivity {
     private EditText mNameEdit;
     private EditText mPasswordEdit;
     private EditText mRepeatEdit;
-    private Spinner mAgeSpinner;
+    private EditText mAgeEdit;
     private Spinner mGenderSpinner;
     private Spinner mPoliticalStatusSpinner;
     private Spinner mEducationStatusSpinner;
@@ -69,7 +69,7 @@ public class SurveyActivity extends AppCompatActivity {
         mNameEdit = findEdit(R.id.editName);
         mPasswordEdit = findEdit(R.id.editPassword);
         mRepeatEdit = findEdit(R.id.editRepeatPassword);
-        mAgeSpinner = findSpinner(R.id.spinnerAge);
+        mAgeEdit = findEdit(R.id.editAge);
         mGenderSpinner = findSpinner(R.id.spinnerGender);
         mPoliticalStatusSpinner = findSpinner(R.id.spinnerPoliticalStatus);
         mEducationStatusSpinner = findSpinner(R.id.spinnerEducationStatus);
@@ -131,10 +131,10 @@ public class SurveyActivity extends AppCompatActivity {
             return;
         }
 
-        HashMap<String, String> survey = new HashMap<>();
+        final HashMap<String, String> survey = new HashMap<>();
         survey.put("username", getValue(mNameEdit));
         survey.put("password", getValue(mPasswordEdit));
-        survey.put("age", getValue(mAgeSpinner));
+        survey.put("age", getValue(mAgeEdit));
         survey.put("gender", getValue(mGenderSpinner));
         survey.put("political_status", getValue(mPoliticalStatusSpinner));
         survey.put("education_status", getValue(mEducationStatusSpinner));
@@ -155,7 +155,8 @@ public class SurveyActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 Toast.makeText(SurveyActivity.this, response, Toast.LENGTH_SHORT).show();
-                SurveyActivity.this.setResult(RESULT_PASSED, new Intent().putExtra("username", getValue(mNameEdit)));
+                SurveyActivity.this.setResult(RESULT_PASSED, new Intent().putExtra("username", survey.get("username")));
+                SurveyActivity.this.setResult(RESULT_PASSED, new Intent().putExtra("age", survey.get("age")));
                 SurveyActivity.this.finish();
             }
         }, new Response.ErrorListener() {

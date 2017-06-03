@@ -1,9 +1,9 @@
-package com.presisco.shared.ui.framework.history;
+package com.presisco.shared.ui.framework.mode;
 
 import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
 
 /**
- * Created by presisco on 2017/4/26.
+ * Created by presisco on 2017/6/2.
  */
 
 /**
@@ -11,7 +11,7 @@ import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
  *
  * @param <EVENT_DATA> 测量数据类型
  */
-public abstract class HistoryMode<EVENT_DATA> {
+public abstract class Analyze<EVENT_DATA> {
     MonitorPanelFragment mPanel;
 
     /**
@@ -40,13 +40,6 @@ public abstract class HistoryMode<EVENT_DATA> {
     public abstract String getPanelType();
 
     /**
-     * 返回模式要显示的名称
-     *
-     * @return 名称字符串
-     */
-    public abstract String getModeTitle();
-
-    /**
      * 对面板的界面进行设置
      */
     public abstract void initPanelView();
@@ -60,7 +53,7 @@ public abstract class HistoryMode<EVENT_DATA> {
     public abstract void analyseData(EVENT_DATA[] data, int analyse_rate);
 
     /**
-     * 对测量到的结果进行呈现
+     * 对分析结果进行呈现
      */
     public abstract void displayResult();
 }

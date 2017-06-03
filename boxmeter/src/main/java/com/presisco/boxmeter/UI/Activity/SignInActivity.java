@@ -63,6 +63,7 @@ public class SignInActivity extends AppCompatActivity implements Response.Listen
         } else {
             Intent intent = new Intent();
             intent.putExtra("username", username);
+            intent.putExtra("age", Integer.parseInt(response));
             setResult(RESULT_PASSED, intent);
             finish();
         }

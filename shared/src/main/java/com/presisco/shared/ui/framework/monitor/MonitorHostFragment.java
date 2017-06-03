@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.presisco.shared.R;
+import com.presisco.shared.utils.LCAT;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,13 +60,18 @@ public class MonitorHostFragment extends Fragment {
         return rootView;
     }
 
+    public void clearState() {
+        mCurrentType = "";
+    }
+
     public void displayPanel(String type) {
+        LCAT.d(this, "displayPanel: current: " + mCurrentType + ", new: " + type);
         if (mCurrentType != type) {
             mCurrentPanel = mPanels.get(type);
             mCurrentType = type;
             FragmentTransaction trans = getFragmentManager().beginTransaction();
             trans.replace(R.id.monitorContent, mCurrentPanel);
-            trans.commit();
+            trans.commitNow();
         } else {
             mPanelViewCreatedListener.panelViewCreated(mCurrentPanel);
         }

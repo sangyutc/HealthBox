@@ -3,7 +3,7 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_personal">个人</string>
-    <string name="title_realtime">实时状况</string>
+    <string name="title_real_time">实时状况</string>
     <string name="title_history">历史记录</string>
     <string name="label_monitor_mode">监控模式</string>
     <string name="label_history_mode">历史模式</string>
@@ -35,22 +35,23 @@
         <item>请重启设备</item>
     </string-array>
 
-    <string-array name="realtime_modes">
-        <item>常规-心率显示</item>
-        <item>常规-心率曲线 1分钟</item>
-        <item>常规-心电曲线 5秒</item>
+    <string-array name="event_types">
+        <item>常规</item>
         <item>有氧运动</item>
         <item>无氧运动</item>
-        <item>睡眠</item>
+        <item>睡眠模式</item>
     </string-array>
 
-    <string-array name="realtime_mode_hints">
-        <item>常规，显示心率数据</item>
-        <item>常规，显示1分钟内心率曲线</item>
-        <item>常规，显示5秒内心电曲线</item>
-        <item>慢跑，游泳等</item>
-        <item>冲刺，球类运动等</item>
-        <item>睡眠参数检测</item>
+    <string-array name="real_time_modes">
+        <item>实时心率</item>
+        <item>心率曲线 1分钟</item>
+        <item>心电曲线 5秒钟</item>
+    </string-array>
+
+    <string-array name="real_time_mode_hints">
+        <item>显示心率数据</item>
+        <item>显示1分钟内心率曲线</item>
+        <item>显示5秒内心电曲线</item>
     </string-array>
 
     <string-array name="history_modes">
@@ -65,5 +66,20 @@
         <item>所有有氧运动记录</item>
         <item>所有无氧运动记录</item>
         <item>睡眠状态记录</item>
+    </string-array>
+
+    <string-array name="text_advice">
+        <item>
+            0-50
+
+         </item>
+        <item>
+            50-80
+
+        </item>
+        <item>
+            80+
+
+        </item>
     </string-array>
 </resources>

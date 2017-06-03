@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.heartmeter.R;
+import com.example.heartmeter.UI.Fragment.AnalyzeFragment;
 import com.example.heartmeter.UI.Fragment.HistoryFragment;
 import com.example.heartmeter.UI.Fragment.PersonalFragment;
 import com.example.heartmeter.UI.Fragment.RealTimeFragment;
@@ -22,30 +23,35 @@ public class MainActivity extends AppCompatActivity {
 
     private ClickTabsFramework mClickTabsFramework;
     private ContentPage[] mContentPages;
+    private Resources res;
+    private int default_color;
+    private int selected_color;
 
     private void prepareContentPages() {
-        Resources res = getResources();
         mContentPages = new ContentPage[]{
                 new ContentPage(
                         RealTimeFragment.newInstance(),
-                        res.getString(R.string.title_realtime),
+                        res.getString(R.string.title_real_time),
                         R.drawable.ic_realtime_default,
-                        R.drawable.ic_realtime_selected,
-                        res.getColor(R.color.colorRealtime)
+                        R.drawable.ic_realtime_selected
                 ),
                 new ContentPage(
                         HistoryFragment.newInstance(),
                         res.getString(R.string.title_history),
                         R.drawable.ic_history_default,
-                        R.drawable.ic_history_selected,
-                        res.getColor(R.color.colorHistory)
+                        R.drawable.ic_history_selected
+                ),
+                new ContentPage(
+                        new AnalyzeFragment(),
+                        res.getString(R.string.label_analyze_mode),
+                        R.drawable.ic_analyze_default,
+                        R.drawable.ic_analyze_selected
                 ),
                 new ContentPage(
                         PersonalFragment.newInstance(),
                         res.getString(R.string.title_personal),
                         R.drawable.ic_personal_default,
-                        R.drawable.ic_personal_selected,
-                        res.getColor(R.color.colorPersonal))
+                        R.drawable.ic_personal_selected)
         };
     }
 
@@ -62,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        res = getResources();
         prepareContentPages();
         mClickTabsFramework = new ClickTabsFramework();
         mClickTabsFramework.setContentItems(getContentFragments());
@@ -71,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         trans.replace(R.id.TabsLayoutHost, mClickTabsFramework);
         trans.commit();
+
+        default_color = res.getColor(R.color.colorIconDefault);
+        selected_color = res.getColor(R.color.colorIconSelected);
     }
 
     private static class ContentPage {
@@ -78,14 +88,12 @@ public class MainActivity extends AppCompatActivity {
         public String mTitle;
         public int mIcon;
         public int mIcon2;
-        public int mColor;
 
-        public ContentPage(Fragment fragment, String title, int icon, int icon2, int color) {
+        public ContentPage(Fragment fragment, String title, int icon, int icon2) {
             mFragment = fragment;
             mTitle = title;
             mIcon = icon;
             mIcon2 = icon2;
-            mColor = color;
         }
     }
 
@@ -101,11 +109,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClickedDraw(View last, int lastpos, View now, int pos) {
             if (last != null && lastpos != -1) {
-                last.setBackgroundColor(getResources().getColor(R.color.colorTabBackground));
                 ((ImageView) last.findViewById(R.id.tabIcon)).setImageResource(mContentPages[lastpos].mIcon);
+                ((TextView) last.findViewById(R.id.tabTitle)).setTextColor(default_color);
             }
-            now.setBackgroundColor(mContentPages[pos].mColor);
             ((ImageView) now.findViewById(R.id.tabIcon)).setImageResource(mContentPages[pos].mIcon2);
+            ((TextView) now.findViewById(R.id.tabTitle)).setTextColor(selected_color);
         }
     }
 }

@@ -110,20 +110,16 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
+            case REQUEST_ID_LOGIN:
             case REQUEST_ID_SIGN_UP:
                 if (resultCode == SurveyActivity.RESULT_PASSED) {
                     String username = data.getStringExtra("username");
-                    mPreferences.edit().putString("username", username).commit();
-                    showUsername();
+                    Integer age = data.getIntExtra("age", 30);
+                    mPreferences.edit()
+                            .putString("username", username)
+                            .putInt("age", age).commit();
                     setUsername(username);
-                }
-                break;
-            case REQUEST_ID_LOGIN:
-                if (resultCode == SignInActivity.RESULT_PASSED) {
-                    String username = data.getStringExtra("username");
-                    mPreferences.edit().putString("username", username).commit();
                     showUsername();
-                    setUsername(username);
                 }
                 break;
         }

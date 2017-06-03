@@ -3,16 +3,20 @@ package com.example.heartmeter.UI.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.example.heartmeter.Data.Event;
 import com.example.heartmeter.R;
 import com.example.heartmeter.Service.HubService;
 import com.presisco.shared.ui.fragment.BaseRealTimeFragment;
+import com.presisco.shared.ui.framework.mode.RealTime;
 import com.presisco.shared.ui.framework.monitor.LinePanelFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
 import com.presisco.shared.ui.framework.monitor.StringPanelFragment;
-import com.presisco.shared.ui.framework.realtime.RealTimeMode;
 import com.presisco.shared.utils.ByteUtils;
 
 import lecho.lib.hellocharts.util.ChartUtils;
@@ -24,14 +28,17 @@ import lecho.lib.hellocharts.util.ChartUtils;
  */
 public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTimeFragment.ActionListener {
 
-    private static final int MODE_DEFAULT_HEART_RATE = 0;
-    private static final int MODE_DEFAULT_HEART_RATE_MINUTE = 1;
-    private static final int MODE_DEFAULT_ECG_FIVE_SEC = 2;
-    private static final int MODE_AEROBIC = 3;
-    private static final int MODE_ANAEROBIC = 4;
-    private static final int MODE_SLEEP = 5;
+    private static final int MODE_HEART_RATE = 0;
+    private static final int MODE_HEART_RATE_MINUTE = 1;
+    private static final int MODE_ECG_FIVE_SEC = 2;
+    private static final String[] EVENT_TYPES = {
+            Event.TYPE_DEFAULT,
+            Event.TYPE_AEROBIC,
+            Event.TYPE_ANAEROBIC,
+            Event.TYPE_SLEEP
+    };
 
-    private RealTimeMode[] mRealTimeModes = null;
+    private RealTime[] mRealTimeModes = null;
 
     public RealTimeFragment() {
     }
@@ -48,20 +55,10 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
     }
 
     private void initModes() {
-        final String[] modes_title = getResources().getStringArray(R.array.realtime_modes);
-        final String[] modes_hint = getResources().getStringArray(R.array.realtime_mode_hints);
-        mRealTimeModes = new RealTimeMode[]{
+        final String[] modes_hint = getResources().getStringArray(R.array.real_time_mode_hints);
+        mRealTimeModes = new RealTime[]{
                 //普通模式
-                new RealTimeMode() {
-                    @Override
-                    public String getModeTitle() {
-                        return modes_title[MODE_DEFAULT_HEART_RATE];
-                    }
-
-                    @Override
-                    public String getEventType() {
-                        return Event.TYPE_DEFAULT;
-                    }
+                new RealTime() {
 
                     @Override
                     public String getPanelType() {
@@ -75,7 +72,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
 
                     @Override
                     public void initPanelView() {
-                        getPanel().setHint(modes_hint[MODE_DEFAULT_HEART_RATE]);
+                        getPanel().setHint(modes_hint[MODE_HEART_RATE]);
                     }
 
                     @Override
@@ -83,16 +80,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
                         ((StringPanelFragment) getPanel()).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
                     }
                 },
-                new RealTimeMode() {
-                    @Override
-                    public String getModeTitle() {
-                        return modes_title[MODE_DEFAULT_HEART_RATE_MINUTE];
-                    }
-
-                    @Override
-                    public String getEventType() {
-                        return Event.TYPE_DEFAULT;
-                    }
+                new RealTime() {
 
                     @Override
                     public String getPanelType() {
@@ -106,7 +94,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
 
                     @Override
                     public void initPanelView() {
-                        getPanel().setHint(modes_hint[MODE_DEFAULT_HEART_RATE_MINUTE]);
+                        getPanel().setHint(modes_hint[MODE_HEART_RATE_MINUTE]);
                         LinePanelFragment linePanel = (LinePanelFragment) getPanel();
                         linePanel.setAxisYScale(0, 250);
                         linePanel.setMaxPoints(60);
@@ -125,16 +113,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
                         ((LinePanelFragment) getPanel()).appendValue(intent.getIntExtra(HubService.KEY_DATA, 0));
                     }
                 },
-                new RealTimeMode() {
-                    @Override
-                    public String getModeTitle() {
-                        return modes_title[MODE_DEFAULT_ECG_FIVE_SEC];
-                    }
-
-                    @Override
-                    public String getEventType() {
-                        return Event.TYPE_DEFAULT;
-                    }
+                new RealTime() {
 
                     @Override
                     public String getPanelType() {
@@ -148,7 +127,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
 
                     @Override
                     public void initPanelView() {
-                        getPanel().setHint(modes_hint[MODE_DEFAULT_ECG_FIVE_SEC]);
+                        getPanel().setHint(modes_hint[MODE_ECG_FIVE_SEC]);
                         LinePanelFragment linePanel = (LinePanelFragment) getPanel();
                         linePanel.setAxisYScale(400, 600);
                         linePanel.setMaxPoints(500);
@@ -168,103 +147,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
                         float[] converted = ByteUtils.intArray2floatArray(ecg_data);
                         ((LinePanelFragment) getPanel()).appendValue(converted);
                     }
-                },
-                //有氧模式
-                new RealTimeMode() {
-                    @Override
-                    public String getModeTitle() {
-                        return modes_title[MODE_AEROBIC];
-                    }
-
-                    @Override
-                    public String getEventType() {
-                        return Event.TYPE_AEROBIC;
-                    }
-
-                    @Override
-                    public String getPanelType() {
-                        return MonitorHostFragment.PANEL_STRING;
-                    }
-
-                    @Override
-                    public String getBroadcastAction() {
-                        return HubService.ACTION_HEART_RATE_REDUCED;
-                    }
-
-                    @Override
-                    public void initPanelView() {
-                        getPanel().setHint(modes_hint[MODE_AEROBIC]);
-                    }
-
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        ((StringPanelFragment) getPanel()).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
-                    }
-                },
-                //无氧模式
-                new RealTimeMode() {
-                    @Override
-                    public String getModeTitle() {
-                        return modes_title[MODE_ANAEROBIC];
-                    }
-
-                    @Override
-                    public String getEventType() {
-                        return Event.TYPE_ANAEROBIC;
-                    }
-
-                    @Override
-                    public String getPanelType() {
-                        return MonitorHostFragment.PANEL_STRING;
-                    }
-
-                    @Override
-                    public String getBroadcastAction() {
-                        return HubService.ACTION_HEART_RATE_REDUCED;
-                    }
-
-                    @Override
-                    public void initPanelView() {
-                        getPanel().setHint(modes_hint[MODE_ANAEROBIC]);
-                    }
-
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        ((StringPanelFragment) getPanel()).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
-                    }
-                },
-                //睡眠模式
-                new RealTimeMode() {
-                    @Override
-                    public String getModeTitle() {
-                        return modes_title[MODE_SLEEP];
-                    }
-
-                    @Override
-                    public String getEventType() {
-                        return Event.TYPE_SLEEP;
-                    }
-
-                    @Override
-                    public String getPanelType() {
-                        return MonitorHostFragment.PANEL_STRING;
-                    }
-
-                    @Override
-                    public String getBroadcastAction() {
-                        return HubService.ACTION_HEART_RATE_REDUCED;
-                    }
-
-                    @Override
-                    public void initPanelView() {
-                        getPanel().setHint(modes_hint[MODE_SLEEP]);
-                    }
-
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        ((StringPanelFragment) getPanel()).setValue(intent.getIntExtra(HubService.KEY_DATA, 0) + "");
-                    }
-                },
+                }
         };
     }
 
@@ -277,20 +160,32 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return super.onCreateView(
+                R.layout.fragment_real_time,
+                R.id.spinnerType,
+                R.id.spinnerDisplay,
+                R.id.monitorHost,
+                R.id.buttonStart,
+                R.id.buttonStop,
+                inflater, container, savedInstanceState);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
     }
 
     @Override
-    public void startEvent(RealTimeMode mode) {
-        getLocalBroadcastmanager().sendBroadcast(
+    public void startEvent(int index) {
+        getLocalBroadcastManager().sendBroadcast(
                 new Intent(HubService.ACTION_START_EVENT)
-                        .putExtra(HubService.KEY_EVENT_TYPE, mode.getEventType()));
+                        .putExtra(HubService.KEY_EVENT_TYPE, EVENT_TYPES[index]));
     }
 
     @Override
-    public void endEvent(RealTimeMode mode) {
-        getLocalBroadcastmanager().sendBroadcast(
+    public void endEvent() {
+        getLocalBroadcastManager().sendBroadcast(
                 new Intent(HubService.ACTION_STOP_EVENT));
     }
 }

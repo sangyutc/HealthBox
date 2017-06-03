@@ -1,4 +1,4 @@
-package com.presisco.shared.ui.framework.realtime;
+package com.presisco.shared.ui.framework.mode;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,7 +13,7 @@ import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
 /**
  * 实时监控模式基类
  */
-public abstract class RealTimeMode extends BroadcastReceiver {
+public abstract class RealTime extends BroadcastReceiver {
     MonitorPanelFragment mPanel;
 
     /**
@@ -35,13 +35,6 @@ public abstract class RealTimeMode extends BroadcastReceiver {
     }
 
     /**
-     * 返回测量模式
-     *
-     * @return 测量模式字符串
-     */
-    public abstract String getEventType();
-
-    /**
      * 返回要显示的面板的类型
      *
      * @return 面板的类型字符串
@@ -54,13 +47,6 @@ public abstract class RealTimeMode extends BroadcastReceiver {
      * @return 监听标签字符串
      */
     public abstract String getBroadcastAction();
-
-    /**
-     * 返回模式要显示的名称
-     *
-     * @return 名称字符串
-     */
-    public abstract String getModeTitle();
 
     /**
      * 对面板的界面进行设置

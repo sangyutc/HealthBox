@@ -27,7 +27,7 @@
                 android:id="@+id/spinnerMode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:entries="@array/history_modes"
+                android:entries="@array/event_types"
                 android:gravity="right" />
         </LinearLayout>
 

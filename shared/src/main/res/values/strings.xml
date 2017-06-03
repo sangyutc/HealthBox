@@ -28,4 +28,6 @@
     <string name="label_sound_off">关闭提示音</string>
     <string name="text_ringtone">出现紧急状况时的提示音</string>
     <string name="label_sign_out">注销</string>
+    <string name="label_analyze_mode">分析模式</string>
+    <string name="label_display_mode">显示模式</string>
 </resources>

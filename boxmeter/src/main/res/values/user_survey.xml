@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="label_age">请问您的年龄是</string>
-    <string-array name="age">
-        <item>小于18周岁</item>
-        <item>18周岁到65周岁</item>
-        <item>大于65周岁</item>
-    </string-array>
     <string name="label_gender">请问您的性别是</string>
     <string-array name="gender">
         <item>男</item>

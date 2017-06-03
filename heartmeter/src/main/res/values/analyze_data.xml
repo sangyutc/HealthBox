@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="default_partition">
+        <item>40</item>
+        <item>60</item>
+        <item>130</item>
+    </string-array>
+
+    <string-array name="default_classification">
+        <item>房室传导阻滞</item>
+        <item>窦性心动过缓</item>
+        <item>正常</item>
+        <item>窦性心动过速</item>
+    </string-array>
+
+    <string-array name="default_colors">
+        <item>#1565C0</item>
+        <item>#00B0FF</item>
+        <item>#2E7D32</item>
+        <item>#D84315</item>
+    </string-array>
+
+    <string-array name="aerobic_partition">
+        <item>0.35</item>
+        <item>0.59</item>
+        <item>0.79</item>
+        <item>0.89</item>
+    </string-array>
+
+    <string-array name="aerobic_classification">
+        <item>较低强度</item>
+        <item>低强度</item>
+        <item>中等强度</item>
+        <item>大强度</item>
+        <item>超大强度</item>
+    </string-array>
+
+    <string-array name="aerobic_colors">
+        <item>#1565C0</item>
+        <item>#00B0FF</item>
+        <item>#2E7D32</item>
+        <item>#F9A825</item>
+        <item>#D84315</item>
+    </string-array>
+
+    <string-array name="anaerobic_partition">
+        <item>0.35</item>
+        <item>0.59</item>
+        <item>0.79</item>
+        <item>0.89</item>
+    </string-array>
+
+    <string-array name="anaerobic_classification">
+        <item>较低强度</item>
+        <item>低强度</item>
+        <item>中等强度</item>
+        <item>大强度</item>
+        <item>超大强度</item>
+    </string-array>
+
+    <string-array name="anaerobic_colors">
+        <item>#1565C0</item>
+        <item>#00B0FF</item>
+        <item>#2E7D32</item>
+        <item>#F9A825</item>
+        <item>#D84315</item>
+    </string-array>
+
+    <string-array name="sleep_partition">
+        <item>65</item>
+    </string-array>
+
+    <string-array name="sleep_classification">
+        <item>正常</item>
+        <item>心脏负荷过高</item>
+    </string-array>
+
+    <string-array name="sleep_colors">
+        <item>#2E7D32</item>
+        <item>#F9A825</item>
+    </string-array>
+</resources>

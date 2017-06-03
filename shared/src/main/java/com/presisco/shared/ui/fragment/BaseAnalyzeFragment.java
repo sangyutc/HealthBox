@@ -1,6 +1,5 @@
 package com.presisco.shared.ui.fragment;
 
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -17,6 +16,7 @@ import android.widget.Spinner;
 import com.presisco.shared.R;
 import com.presisco.shared.data.BaseEvent;
 import com.presisco.shared.data.BaseEventData;
+import com.presisco.shared.ui.framework.mode.Analyze;
 import com.presisco.shared.ui.framework.monitor.MonitorHostFragment;
 import com.presisco.shared.ui.framework.monitor.MonitorPanelFragment;
 
@@ -27,24 +27,31 @@ import java.util.concurrent.Executors;
 /**
  * A simple {@link Fragment} subclass.
  */
-public abstract class BaseHistoryFragment extends Fragment implements MonitorPanelFragment.ViewCreatedListener {
+public class BaseAnalyzeFragment extends Fragment implements MonitorPanelFragment.ViewCreatedListener {
     private ActionListener mChildListener;
     private Spinner mModeSpinner;
     private Spinner mEventSpinner;
     private EventAdapter mEventAdapter;
     private MonitorHostFragment mMonitorHost;
     private MonitorPanelFragment mCurrentPanel = null;
+    private Analyze[] mAnalyzeModes = null;
+    private Analyze mCurrentMode = null;
     private BaseEvent[] mEvents = null;
     private BaseEvent mCurrentEvent = null;
     private ArrayList<String> mEventTitles = new ArrayList<>();
     private ProgressDialog mAnalyseProgress;
     private Executor mAnalyseExecutor = Executors.newSingleThreadExecutor();
-    public BaseHistoryFragment() {
+
+    public BaseAnalyzeFragment() {
         // Required empty public constructor
     }
 
     protected void setChildListener(ActionListener listener) {
         mChildListener = listener;
+    }
+
+    protected void setHistoryModes(Analyze[] modes) {
+        mAnalyzeModes = modes;
     }
 
     private void refreshEventTitles() {
@@ -60,16 +67,14 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
             int mode_spinner_id,
             int event_spinner_id,
             int monitor_host_id,
-            int delete_btn_id,
-            int comment_btn_id,
-            LayoutInflater inflater,
-            ViewGroup container,
+            LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(layout_id, container, false);
         if (mMonitorHost == null) {
             mMonitorHost = MonitorHostFragment.newInstance();
         }
+        mMonitorHost.clearState();
         mMonitorHost.setPanelViewCreatedListener(this);
         FragmentTransaction trans = getChildFragmentManager().beginTransaction();
         trans.replace(monitor_host_id, mMonitorHost);
@@ -80,7 +85,11 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id) {
+                mCurrentMode = mAnalyzeModes[pos];
+
+                mMonitorHost.displayPanel(mCurrentMode.getPanelType());
                 mEvents = mChildListener.loadEvents(pos);
+
                 refreshEventTitles();
             }
 
@@ -96,7 +105,7 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mCurrentEvent = mEvents[position];
-                new HistoryTask().executeOnExecutor(mAnalyseExecutor, mCurrentEvent.id);
+                new AnalyseTask().executeOnExecutor(mAnalyseExecutor, mCurrentEvent.id);
             }
 
             @Override
@@ -106,39 +115,20 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
         });
         mEventSpinner.setAdapter(mEventAdapter);
 
-        rootView.findViewById(delete_btn_id).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mChildListener.deleteEvent(mCurrentEvent.id);
-                mEventAdapter.remove(mCurrentEvent.start_time);
-            }
-        });
-
         mAnalyseProgress = new ProgressDialog(getContext());
         mAnalyseProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mAnalyseProgress.setIndeterminate(true);
         mAnalyseProgress.setTitle("正在进行分析");
 
-        rootView.findViewById(comment_btn_id).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mChildListener.comment();
-            }
-        });
-
         return rootView;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mMonitorHost.displayPanel(MonitorHostFragment.PANEL_LINE);
     }
 
     @Override
     public void panelViewCreated(MonitorPanelFragment panel) {
         mCurrentPanel = panel;
         mCurrentPanel.clear();
+        mCurrentMode.setPanel(mCurrentPanel);
+        mCurrentMode.initPanelView();
     }
 
     @Override
@@ -154,12 +144,6 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
         BaseEvent[] loadEvents(int position);
 
         BaseEventData[] loadEventData(long event_id);
-
-        void displayEventData(MonitorPanelFragment panel, BaseEventData[] event_data_set, int analyze_rate);
-
-        void deleteEvent(long event_id);
-
-        void comment();
     }
 
     private class EventAdapter extends ArrayAdapter<String> {
@@ -168,21 +152,24 @@ public abstract class BaseHistoryFragment extends Fragment implements MonitorPan
         }
     }
 
-    private class HistoryTask extends AsyncTask<Long, Void, BaseEventData[]> {
+    private class AnalyseTask extends AsyncTask<Long, Void, Void> {
         @Override
-        protected void onPostExecute(BaseEventData[] event_data) {
+        protected void onPostExecute(Void aVoid) {
             mAnalyseProgress.hide();
-            mChildListener.displayEventData(mCurrentPanel, event_data, mCurrentEvent.analyse_rate);
+            mCurrentMode.displayResult();
         }
 
         @Override
         protected void onPreExecute() {
             mAnalyseProgress.show();
+            mMonitorHost.displayPanel(mCurrentMode.getPanelType());
         }
 
         @Override
-        protected BaseEventData[] doInBackground(Long... params) {
-            return mChildListener.loadEventData(params[0]);
+        protected Void doInBackground(Long... params) {
+            BaseEventData[] event_data = mChildListener.loadEventData(params[0]);
+            mCurrentMode.analyseData(event_data, mCurrentEvent.analyse_rate);
+            return null;
         }
     }
 }

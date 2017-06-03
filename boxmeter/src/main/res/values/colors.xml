@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorTabBackground">#F5F5F5</color>
+    <color name="colorIconDefault">#424242</color>
+    <color name="colorIconSelected">#1565C0</color>
     <color name="colorRealtime">#F44336</color>
     <color name="colorHistory">#03A9F4</color>
     <color name="colorPersonal">#00E676</color>

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.presisco.shared.R;
+import com.presisco.shared.utils.LCAT;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,10 +30,12 @@ public class PiePanelFragment extends ChartPanelFragment {
 
     public PiePanelFragment() {
         super();
+        LCAT.d(this, "created");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        LCAT.d(this, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_pie_panel, container, false);
 
         mPieChartView = (PieChartView) rootView.findViewById(R.id.pieChart);
@@ -81,6 +84,7 @@ public class PiePanelFragment extends ChartPanelFragment {
 
     @Override
     protected void initChart() {
+        LCAT.d(this, "initChart");
         mPieChartData = new PieChartData(mSlices);
 
         mPieChartData.setHasLabels(mPieStyle.has_label);

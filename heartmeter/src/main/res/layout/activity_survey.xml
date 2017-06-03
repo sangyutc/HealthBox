@@ -74,18 +74,22 @@
                 style="@style/SurveyRow"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_age" />
 
-                <Spinner
-                    android:id="@+id/spinnerAge"
+                <EditText
+                    android:id="@+id/editAge"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:entries="@array/age" />
+                    android:ems="10"
+                    android:gravity="right"
+                    android:inputType="number"
+                    android:text="16" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -177,7 +181,6 @@
                     android:layout_width="187dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.02"
-                    android:entries="@array/age"
                     android:gravity="right"
                     android:inputType="numberDecimal"
                     android:text="100.5" />

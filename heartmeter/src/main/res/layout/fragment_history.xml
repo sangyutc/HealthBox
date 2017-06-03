@@ -1,0 +1,81 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/PanelRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.presisco.shared.ui.fragment.BaseHistoryFragment">
+
+    <LinearLayout
+        android:id="@+id/modeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/label_history_mode"
+            android:visibility="visible" />
+
+        <Spinner
+            android:id="@+id/spinnerMode"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:entries="@array/event_types" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/eventLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/modeLayout"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/label_event" />
+
+        <Spinner
+            android:id="@+id/spinnerEvent"
+            android:layout_width="235dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="right" />
+
+        <Button
+            android:id="@+id/deleteButton"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/label_delete" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonComment"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/label_comment" />
+
+    <FrameLayout
+        android:id="@+id/monitorHost"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/buttonComment"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/eventLayout">
+
+    </FrameLayout>
+
+</RelativeLayout>
