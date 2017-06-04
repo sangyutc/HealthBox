@@ -101,6 +101,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
                         linePanel.setXStep(1);
                         linePanel.setAxisXText("Time");
                         linePanel.setAxisYText("Rate");
+                        linePanel.setScrollable(false);
                         LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
                         style.line_color = ChartUtils.COLOR_BLUE;
                         style.has_points = false;
@@ -134,6 +135,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
                         linePanel.setXStep(0.01f);
                         linePanel.setAxisXText("Time");
                         linePanel.setAxisYText("Voltage");
+                        linePanel.setScrollable(false);
                         LinePanelFragment.LineStyle style = new LinePanelFragment.LineStyle();
                         style.line_color = ChartUtils.COLOR_BLUE;
                         style.has_points = false;

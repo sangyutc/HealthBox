@@ -103,7 +103,9 @@ public class LinePanelFragment extends ChartPanelFragment {
                 mPoints.remove(0);
             }
         }
-        scrollViewport();
+        if (!mScrollable) {
+            scrollViewport();
+        }
         initChart();
     }
 
@@ -113,7 +115,9 @@ public class LinePanelFragment extends ChartPanelFragment {
             mPoints.remove(0);
         }
         mLastXCoord += mXStep;
-        scrollViewport();
+        if (!mScrollable) {
+            scrollViewport();
+        }
         initChart();
     }
 
@@ -137,7 +141,7 @@ public class LinePanelFragment extends ChartPanelFragment {
                 mPoints.remove(0);
             }
         }
-        if (mScrollable) {
+        if (!mScrollable) {
             scrollViewport();
         }
         initChart();

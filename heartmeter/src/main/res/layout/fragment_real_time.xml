@@ -52,7 +52,7 @@
         android:id="@+id/monitorHost"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/bottombar"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/displaybar"
         android:layout_weight="1.11">
