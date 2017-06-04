@@ -216,6 +216,7 @@ public class BTService extends BaseBluetoothService
                     for (int i = 0; i < mBTPacketSize - 1; ++i) {
                         packet[i] = mBTBuffer[i];
                     }
+                    //把byte数组传到onpacketreceived函数中
                     getPacketReceivedListener().onPacketReceived(packet);
                 }
                 //重置计数器

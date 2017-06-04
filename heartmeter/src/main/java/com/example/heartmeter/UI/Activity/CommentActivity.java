@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.example.heartmeter.R;
 
+//用户自我评价
 public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override

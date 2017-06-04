@@ -34,6 +34,7 @@ public class SignInActivity extends AppCompatActivity implements Response.Listen
         mQueue = Volley.newRequestQueue(this);
     }
 
+    //按钮响应
     public void onLogin(View v) {
         username = mUsernameEdit.getText().toString().trim();
         String password = mPasswordEdit.getText().toString();
@@ -43,7 +44,7 @@ public class SignInActivity extends AppCompatActivity implements Response.Listen
     /**
      * Callback method that an error has been occurred with the
      * provided error code and optional user-readable message.
-     *
+     *网络错误响应
      * @param error
      */
     @Override
@@ -53,7 +54,7 @@ public class SignInActivity extends AppCompatActivity implements Response.Listen
 
     /**
      * Called when a response is received.
-     *
+     *网络正常响应
      * @param response
      */
     @Override

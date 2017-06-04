@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 /**
  * 用户注册及调查窗口
- */
+ **/
 public class SurveyActivity extends AppCompatActivity {
     //所有的执行结果定义
     public static final int RESULT_CANCELED = 0;

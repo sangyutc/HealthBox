@@ -61,51 +61,61 @@ public class PersonalFragment extends BasePersonalFragment implements BasePerson
     }
 
     @Override
+    //登陆
     public void onSignIn() {
         startActivityForResult(new Intent(getActivity(), SignInActivity.class), REQUEST_ID_LOGIN);
     }
 
+    //注册
     @Override
     public void onSignUp() {
         startActivityForResult(new Intent(getActivity(), SurveyActivity.class), REQUEST_ID_SIGN_UP);
     }
 
+    //注销
     @Override
     public void onSignOut() {
         mPreferences.edit().putString("username", "").commit();
         showLogin();
     }
 
+    //蓝牙测试
     @Override
     public void onBTBox() {
         startActivity(new Intent(getActivity(), BTBoxActivity.class));
     }
 
+    //上传数据到服务器
     @Override
     public void onInstantUpload() {
         startActivity(new Intent(getActivity(), NetTaskDebugActivity.class));
     }
 
+    //蓝牙链接
     @Override
     public void onBTReconnect() {
         LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(BTService.ACTION_TARGET_CONNECT));
     }
 
+    //模拟数据测试
     @Override
     public void onDBDebug() {
         startActivity(new Intent(getActivity(), DBDebugActivity.class));
     }
 
+    //监护设置
     @Override
     public void onMonitorSetting() {
         startActivity(new Intent(getActivity(), MonitorPreferenceActivity.class));
     }
 
+    //测试监护
     @Override
     public void onMonitorDebug() {
         startActivity(new Intent(getActivity(), MonitorDebugActivity.class));
     }
 
+    //结果信息反馈
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

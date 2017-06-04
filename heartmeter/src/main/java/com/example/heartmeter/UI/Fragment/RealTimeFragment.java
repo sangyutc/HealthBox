@@ -178,6 +178,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
         super.onDestroy();
     }
 
+    //开始按钮
     @Override
     public void startEvent(int index) {
         getLocalBroadcastManager().sendBroadcast(
@@ -185,6 +186,7 @@ public class RealTimeFragment extends BaseRealTimeFragment implements BaseRealTi
                         .putExtra(HubService.KEY_EVENT_TYPE, EVENT_TYPES[index]));
     }
 
+    //停止按钮
     @Override
     public void endEvent() {
         getLocalBroadcastManager().sendBroadcast(

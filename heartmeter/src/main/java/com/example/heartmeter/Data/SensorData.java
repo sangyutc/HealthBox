@@ -4,9 +4,6 @@ import android.util.Log;
 
 import com.presisco.shared.utils.ByteUtils;
 
-/**
- *
- */
 
 public class SensorData {
     public static final int STATUS_NORMAL = 0;

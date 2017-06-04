@@ -44,23 +44,28 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
             )
     };
     private static final String DATABASE_NAME = "app_data";
-
+    //在数据库中写入事件
     private static final String STATEMENT_INSERT_EVENT = "insert into " + TABLE_EVENT
             + "( " + COLUMN_EVENT_TYPE + "," + COLUMN_ANALYSE_RATE + "," + COLUMN_START_TIME
             + " ) values(?,?,?)";
+    //在数据库中写入数据
     private static final String STATEMENT_INSERT_DATA = "insert into " + TABLE_HEART_RATE
             + "( " + COLUMN_EVENT_ID + "," + COLUMN_HEART_RATE + "," + COLUMN_OFFSET_TIME
             + ") values(?,?,?)";
+    //在数据库中删除事件
     private static final String STATEMENT_DELETE_EVENT = "delete from " + TABLE_EVENT
             + " where " + COLUMN_EVENT_ID + " = ?";
+    //在数据库中删除数据
     private static final String STATEMENT_DELETE_DATA = "delete from " + TABLE_HEART_RATE
             + " where " + COLUMN_EVENT_ID + " = ?";
 
+    //建立数据库
     public SQLiteManager(Context context) {
         super(context, DATABASE_NAME, TABLES);
     }
 
     @Override
+    //从数据库中读取事件
     protected Event[] getEvents(Cursor cursor) {
         Event[] events = new Event[cursor.getCount()];
         int index = 0;
@@ -75,6 +80,7 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
         return events;
     }
 
+    //以类型入手读取事件
     @Override
     public Event[] getEventsByType(String type) {
         Cursor cursor = getDatabase(READ_DATABASE).query(
@@ -82,6 +88,7 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
         return getEvents(cursor);
     }
 
+    //读取所有事件
     @Override
     public Event[] getAllEvents() {
         Cursor cursor = getDatabase(READ_DATABASE).query(
@@ -89,6 +96,7 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
         return getEvents(cursor);
     }
 
+    //读取某个id之后的事件
     @Override
     public Event[] getEventsAfter(long event_id) {
         Cursor cursor = getDatabase(READ_DATABASE).query(
@@ -96,6 +104,7 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
         return getEvents(cursor);
     }
 
+    //读取事件中所有数据
     @Override
     public EventData[] getAllDataInEvent(long event_id) {
         Cursor cursor = getDatabase(READ_DATABASE).query(
@@ -114,9 +123,11 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
         return data;
     }
 
+    //增加新事件
     @Override
     public long addEvent(Event base_event) {
         Event event = base_event;
+        //执行新事件插入
         SQLiteStatement statement = getDatabase(WRITE_DATABASE).compileStatement(STATEMENT_INSERT_EVENT);
         statement.bindString(1, event.type);
         statement.bindLong(2, event.analyse_rate);
@@ -125,6 +136,7 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
         return event_id;
     }
 
+    //给事件添加数据
     @Override
     public void addDataToEvent(EventData data) {
         SQLiteStatement statement = getDatabase(WRITE_DATABASE).compileStatement(STATEMENT_INSERT_DATA);
@@ -134,6 +146,7 @@ public class SQLiteManager extends HealthDataManager<Event, EventData> {
         statement.executeInsert();
     }
 
+    //添加对象数组数据到数据库
     @Override
     public void addDataToEvent(EventData[] base_event_data) {
         for (EventData eventData : base_event_data) {

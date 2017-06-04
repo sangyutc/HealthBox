@@ -5,9 +5,6 @@ import com.presisco.shared.data.BaseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by presisco on 2017/4/19.
- */
 
 public class Event extends BaseEvent {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd-HH:mm");

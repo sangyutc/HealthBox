@@ -24,7 +24,7 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     /**
-     * 启动窗口
+     ** 启动窗口
      */
     private class IgniteTask extends AsyncTask<Void, Void, Void> {
         @Override
